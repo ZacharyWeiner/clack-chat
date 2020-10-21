@@ -1,6 +1,6 @@
 const defaultTheme = require("tailwindcss/defaultTheme");
 
-whitelist = [
+const whitelist = [
   "gray",
   "red",
   "orange",
