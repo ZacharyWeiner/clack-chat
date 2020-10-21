@@ -1,21 +1,40 @@
-const { colors } = require('tailwindcss/defaultTheme')
+const defaultTheme = require("tailwindcss/defaultTheme");
+
+whitelist = [
+  "gray",
+  "red",
+  "orange",
+  "yellow",
+  "green",
+  "teal",
+  "blue",
+  "purple",
+  "pink"
+].reduce(
+  (result, color) =>
+    result.push(`text-${color}-600`, `bg-${color}-600`, `bg-${color}-500`) &&
+    result,
+  []
+);
+
 module.exports = {
   future: {
-    // removeDeprecatedGapUtilities: true,
-    // purgeLayersByDefault: true,
+    removeDeprecatedGapUtilities: true,
+    purgeLayersByDefault: true
   },
-  purge: [],
+  purge: {
+    enabled: process.env.NODE_ENV === "production",
+    content: ["./index.html", "./src/**/*.{vue, js}"],
+    options: {
+      whitelist
+    }
+  },
   theme: {
     extend: {
-      colors: {
-        //Give the default template more directives. 
-        // Use these names in the place of named colors on helper classes
-        //Ex: bg-primary 
-        primary: '#5c6ac4',
-        secondary: '#ecc94b',
+      fontFamily: {
+        sans: ["Inter var", ...defaultTheme.fontFamily.sans]
       }
-    },
+    }
   },
-  variants: {},
-  plugins: [],
-}
+  plugins: [require("@tailwindcss/custom-forms")]
+};
