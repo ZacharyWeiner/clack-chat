@@ -1,3 +1,59 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+
+@layer components{
+    .btn{
+        @apply inline-flex items-center justify-center px-5 py-3 border border-transparent text-base leading-6 font-medium rounded-md text-indigo-600 bg-white transition duration-150 ease-in-out 
+    }
+
+    .btn:hover{
+        @apply text-indigo-500;
+    }
+
+    .btn:focus{
+        @apply outline-none shadow-outline;
+    }
+
+    .btn-primary{
+        @apply bg-indigo-600 text-white;
+    }
+
+    .btn-primary:hover{
+        @apply bg-indigo-500 text-white;
+    }
+}
+
+/* Use the @layer directive to tell Tailwind which "bucket" 
+a set of custom styles belong in. Valid layers are a base, components, and utilities.*/
+/* //adding utilities  */
+@layer utilities {
+    /* These utilities can be applied at specific size breakpoints because of the
+    responsive declaration below */
+    @responsive {
+        /* You can generate responsive, hover, focus, active, and other variants of your own utilities 
+        by wrapping their definitions in the @variants directive. */
+      @variants hover, focus {
+        .filter-none {
+          filter: none;
+        }
+        .filter-grayscale {
+          filter: grayscale(100%);
+        }
+      }
+    }
+  }
+
+/* The @screen directive allows you to create media queries that 
+reference your breakpoints by name instead of duplicating their values in your own CSS. */
+@screen sm {
+    /* ... */
+  }
+
+/* Use the theme() function to access your Tailwind config values using dot notation.
+This can be a useful alternative to @apply when you want to reference a value from your theme configuration for only part of a declaration: */
+.btn-from-theme {
+    background-color: theme('colors.blue.500');
+  }
