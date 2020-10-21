@@ -61,7 +61,7 @@
           />
         </svg>
       </button>
-
+      <div>[username]</div>
       <div class="relative">
         <button
           @click="dropdownOpen = !dropdownOpen"
@@ -73,7 +73,6 @@
             alt="Your avatar"
           />
         </button>
-
         <div
           v-show="dropdownOpen"
           @click="dropdownOpen = false"

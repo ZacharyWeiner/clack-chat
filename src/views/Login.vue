@@ -21,7 +21,7 @@
             fill="white"
           />
         </svg>
-        <span class="text-gray-700 font-semibold text-2xl">V-Dashboard</span>
+        <span class="text-gray-700 font-semibold text-2xl text-center">[Brand Fleet Billing]<br/> by MFC</span>
       </div>
 
       <form class="mt-4" @submit.prevent="login">

@@ -15,7 +15,7 @@
               href="https://medium.com/@horaceh/how-to-setup-a-tailwind-css-tailwind-ui-project-with-vue-cli-fdc671d69e48"
               class="btn btn-primary"
             >
-              How to
+              Button Example
             </a>
           </div>
           <div class="ml-3 inline-flex rounded-md shadow">
@@ -23,7 +23,7 @@
               href="https://github.com/horaceho/vue-tailwind-skeleton"
               class="btn"
             >
-              Github
+              Secondary Button Example
             </a>
           </div>
         </div>

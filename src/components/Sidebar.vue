@@ -35,7 +35,7 @@
           </svg>
 
           <span class="text-white text-2xl mx-2 font-semibold"
-            >V-Dashboard</span
+            >[Brand Here]</span
           >
         </div>
       </div>

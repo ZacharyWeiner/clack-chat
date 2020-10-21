@@ -124,7 +124,7 @@
               type="radio"
               :class="`form-radio h-5 w-5 text-${c}-600`"
               name="radio"
-            /><span class="ml-2 text-gray-700">label</span>
+            /><span :class="`ml-2 text-${c}-700`">label</span>
           </label>
         </div>
       </div>
@@ -159,12 +159,13 @@
         <div class="flex rounded-md bg-white py-4 px-4 overflow-x-auto">
           <button
             :class="
-              `px-6 py-3 bg-${c}-600 rounded-md text-white font-medium tracking-wide hover:bg-${c}-500 ${index &&
+              `px-2 py-3 bg-${c}-600 rounded-md text-white font-medium tracking-wide hover:bg-${c}-500 ${index &&
                 'ml-3'}`
             "
             v-for="(c, index) in colors"
             :key="index"
           >
+            <i class="fas fa-spinner animate-spin" viewBox="0 0 24 24"></i>
             Button
           </button>
         </div>
@@ -185,17 +186,17 @@
             >
             <a
               href="#"
-              class="py-2 px-3 leading-tight bg-white border border-gray-200 text-blue-700 border-r-0 hover:bg-indigo-500 hover:text-white"
+              class="rounded-full py-2 px-3 leading-tight bg-white border border-blue-200 text-blue-700 border-r-0 hover:bg-indigo-500 hover:text-white"
               ><span>1</span></a
             >
             <a
               href="#"
-              class="py-2 px-3 leading-tight bg-white border border-gray-200 text-blue-700 border-r-0 hover:bg-indigo-500 hover:text-white"
+              class="rounded-full py-2 px-3 leading-tight bg-white border border-blue-200 text-blue-700 border-r-0 hover:bg-indigo-500 hover:text-white"
               ><span>2</span></a
             >
             <a
               href="#"
-              class="py-2 px-3 leading-tight bg-white border border-gray-200 text-blue-700 border-r-0 hover:bg-indigo-500 hover:text-white"
+              class="rounded-full py-2 px-3 leading-tight bg-indigo-500 border border-blue-200 text-white border-r-0 hover:bg-white hover:text-white"
               ><span>3</span></a
             >
             <a
