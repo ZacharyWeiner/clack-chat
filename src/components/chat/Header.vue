@@ -1,10 +1,10 @@
-<template> 
+<template>
   <h3 class="text-gray-700 text-3xl font-medium">Address: {{ address }}</h3>
 </template>
 <script>
 import Computer from "bitcoin-computer";
 import * as Constants from "@/constants/LocalStorageConstants.js";
-import FileUtils from "@/utilities/FileUtils.js";
+//import FileUtils from "@/utilities/FileUtils.js";
 export default {
   name: "Header",
   async setup() {
@@ -15,8 +15,14 @@ export default {
     });
     const computer = _computer;
     const address = computer.db.wallet.getAddress().toString();
-    let _contract = await FileUtils.importFromPublic("chat-thread.js");
-    console.log(_contract);
+    // const pubKey = computer.db.wallet.getPublicKey().toString();
+    // let _contract = await FileUtils.importFromPublic("chat-thread.js");
+    // let thread = await computer.new(_contract, [
+    //   pubKey,
+    //   "clack.chat",
+    //   "Some Thread"
+    // ]);
+    // console.log(thread);
     return { address };
   }
 };
