@@ -22,25 +22,24 @@
           />
         </svg>
         <span class="text-gray-700 font-semibold text-2xl text-center"
-          >[Brand Fleet Billing]<br />
-          by MFC</span
+          >Clack Chat</span
         >
       </div>
 
-      <form class="mt-4" @submit.prevent="login">
+      <form class="mt-4" @submit.prevent="login(displayName, password)">
         <label class="block">
-          <span class="text-gray-700 text-sm">Email</span>
+          <span class="text-gray-700 text-sm">Display Name</span>
           <input
             type="email"
             class="form-input mt-1 block w-full rounded-md focus:border-indigo-600"
-            v-model="email"
+            v-model="displayName"
           />
         </label>
 
         <label class="block mt-3">
           <span class="text-gray-700 text-sm">Password</span>
           <input
-            type="password"
+            type="text"
             class="form-input mt-1 block w-full rounded-md focus:border-indigo-600"
             v-model="password"
           />
@@ -79,20 +78,36 @@
 <script>
 import { defineComponent, ref } from "vue";
 import { useRouter } from "vue-router";
+import Computer from "bitcoin-computer";
+import * as Constants from "./../constants/LocalStorageConstants";
 
 export default defineComponent({
   setup() {
     const router = useRouter();
-    const email = ref("johndoe@mail.com");
-    const password = ref("@#!@#asdf1231!_!@#");
+    const displayName = ref("johndoe@mail.com");
+    const password = ref("");
 
-    function login() {
-      router.push("/dashboard");
-    }
+    const login = async (name, pass) => {
+      try {
+        const computer = new Computer({
+          chain: "BSV",
+          network: "testnet",
+          seed: pass
+        });
+        let address = await computer.db.wallet.getAddress();
+        console.log("Successfully Logged In", address);
+        window.localStorage.setItem(Constants.SEED, pass);
+        window.localStorage.setItem(Constants.DISPLAYNAME, name);
+        router.push("/dashboard");
+      } catch (err) {
+        alert(err);
+        console.log(err);
+      }
+    };
 
     return {
       login,
-      email,
+      displayName,
       password
     };
   }

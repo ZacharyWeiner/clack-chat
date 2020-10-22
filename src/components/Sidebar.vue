@@ -34,9 +34,7 @@
             />
           </svg>
 
-          <span class="text-white text-2xl mx-2 font-semibold"
-            >[Brand Here]</span
-          >
+          <span class="text-white text-2xl mx-2 font-semibold">Clack</span>
         </div>
       </div>
 

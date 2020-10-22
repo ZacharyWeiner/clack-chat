@@ -7,6 +7,7 @@ import UIElements from "../views/UIElements.vue";
 import Login from "../views/Login.vue";
 import Modal from "../views/Modal.vue";
 import Card from "../views/Card.vue";
+import Chat from "../views/Chat.vue";
 import Blank from "../views/Blank.vue";
 
 const routes = [
@@ -21,6 +22,11 @@ const routes = [
     name: "Login",
     component: Login,
     meta: { layout: "empty" }
+  },
+  {
+    path: "/chat",
+    name: "Chat",
+    component: Chat
   },
   {
     path: "/dashboard",

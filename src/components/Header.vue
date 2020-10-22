@@ -61,7 +61,7 @@
           />
         </svg>
       </button>
-      <div>[username]</div>
+      <div>{{ displayName }}</div>
       <div class="relative">
         <button
           @click="dropdownOpen = !dropdownOpen"
@@ -104,19 +104,24 @@
   </header>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from "vue";
+<script>
+import { ref } from "vue";
 import { useSidebar } from "../hooks/useSidebar";
+import * as Constants from "./../constants/LocalStorageConstants";
 
-export default defineComponent({
+export default {
   setup() {
     const dropdownOpen = ref(false);
     const { isOpen } = useSidebar();
+    let _dn = window.localStorage.getItem(Constants.DISPLAYNAME);
+    const displayName = ref(_dn);
+    console.log("Display Name:", _dn);
 
     return {
       isOpen,
-      dropdownOpen
+      dropdownOpen,
+      displayName
     };
   }
-});
+};
 </script>
