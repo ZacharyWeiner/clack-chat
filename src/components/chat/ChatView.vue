@@ -2,10 +2,7 @@
   <div>
     <div class="flex mb-4 h-full">
       <div class="w-1/4 bg-gray-100 h-12">
-        <button
-          @click="open = true"
-          class="btn btn-primary w-full"
-        >
+        <button @click="open = true" class="btn btn-primary w-full">
           + New Chat
         </button>
         <h3 class="px-6 text-3xl">Chats</h3>
@@ -22,8 +19,8 @@
         <div v-if="threadTitle !== ''">
           <h3 class="px-6 text-4xl">{{ threadTitle }}</h3>
           <div
-              class="border-2 border-dashed border-gray-400 rounded-lg h-96"
-            ></div>
+            class="border-2 border-dashed border-gray-400 rounded-lg h-96"
+          ></div>
         </div>
         <div v-for="m in messages" :key="m">
           <div class="rounded  overflow-hidden shadow-lg mt-6">
@@ -44,11 +41,17 @@
             v-model="newMessage"
             placeholder="New Message..."
           />
-          <button @click.prevent="sendMessage" class='btn btn-primary float-right'><i class='fa fa-paper-plane mr-3'></i> Send</button>
+          <button
+            @click.prevent="sendMessage"
+            class="btn btn-primary float-right"
+          >
+            <i class="fa fa-paper-plane mr-3"></i> Send
+          </button>
         </div>
       </div>
     </div>
   </div>
+  {{ revList }}
   <div
     :class="
       `modal ${!open &&
@@ -105,12 +108,14 @@
   </div>
 </template>
 <script>
-import { ref } from "vue";
+import { inject, readonly, ref } from "vue";
 import Computer from "bitcoin-computer";
 import * as Constants from "./../../constants/LocalStorageConstants.js";
 import FileUtils from "@/utilities/FileUtils.js";
 export default {
   async setup() {
+    const revList = inject(readonly("revList"));
+    const updateRevList = inject("updateRevList");
     let messagesList = ["none"];
     const messages = ref(messagesList);
     const open = ref(false);
@@ -130,6 +135,7 @@ export default {
     let balance = ref(await computer.db.wallet.getBalance(_pk));
     let _revs = await computer.getRevs(_pk);
     let revs = ref(_revs);
+    updateRevList(_revs);
     console.log(revs.value.length);
     console.log(balance);
     return {
@@ -142,8 +148,15 @@ export default {
       messages,
       newMessage,
       showNewMessage,
-      threadTitle
+      threadTitle,
+      revList
     };
+  },
+  mounted() {
+    console.log("Chat Vue was mounted");
+    if (this.$route.params.id) {
+      this.changeThread(this.$route.params.id);
+    }
   },
   methods: {
     async createNewChatThread() {

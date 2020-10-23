@@ -30,6 +30,12 @@ const routes = [
     meta: { layout: "chat" }
   },
   {
+    path: "/chat/:id",
+    name: "Chat",
+    component: Chat,
+    meta: { layout: "chat" }
+  },
+  {
     path: "/dashboard",
     name: "Dashboard",
     component: Dashboard

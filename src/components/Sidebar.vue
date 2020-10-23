@@ -175,26 +175,24 @@
           <span class="mx-4">Modal</span>
         </router-link>
 
-        <router-link
-          class="flex items-center mt-4 py-2 px-6 border-l-4"
-          :class="[$route.name === 'Blank' ? activeClass : inactiveClass]"
-          to="/blank"
-        >
-          <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-            <path
-              d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"
-            />
-          </svg>
+        <div v-for="rev in revList" :key="rev">
+          <router-link
+            class="flex items-center mt-4 py-2 px-6 border-l-4"
+            :class="[$route.name === 'Blank' ? activeClass : inactiveClass]"
+            :to="`/chat/${rev}`"
+          >
+            <i class="fas fa-comments"></i>
 
-          <span class="mx-4">Blank</span>
-        </router-link>
+            <span class="mx-4">{{ rev.substring(0, 8) }}</span>
+          </router-link>
+        </div>
       </nav>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, inject, ref } from "vue";
 import { useSidebar } from "../hooks/useSidebar";
 
 export default defineComponent({
@@ -206,11 +204,13 @@ export default defineComponent({
     const inactiveClass = ref(
       "border-gray-900 text-gray-500 hover:bg-gray-600 hover:bg-opacity-25 hover:text-gray-100"
     );
+    const revList = inject("revList");
 
     return {
       isOpen,
       activeClass,
-      inactiveClass
+      inactiveClass,
+      revList
     };
   }
 });
