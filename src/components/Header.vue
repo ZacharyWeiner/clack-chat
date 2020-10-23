@@ -24,7 +24,7 @@
       </button>
 
       <div class="relative mx-4 lg:mx-0">
-        <span class="absolute inset-y-0 left-0 pl-3 flex items-center">
+        <!-- <span class="absolute inset-y-0 left-0 pl-3 flex items-center">
           <svg class="h-5 w-5 text-gray-500" viewBox="0 0 24 24" fill="none">
             <path
               d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z"
@@ -34,13 +34,13 @@
               stroke-linejoin="round"
             />
           </svg>
-        </span>
+        </span> -->
 
-        <input
+        <!-- <input
           class="form-input w-32 sm:w-64 rounded-md pl-10 pr-4 focus:border-indigo-600"
           type="text"
           placeholder="Search"
-        />
+        /> -->
       </div>
     </div>
 
@@ -88,16 +88,12 @@
             class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-600 hover:text-white"
             >Profile</a
           >
-          <a
-            href="#"
-            class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-600 hover:text-white"
-            >Products</a
+          <button
+            @click="logout"
+            class="w-full block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-600 hover:text-white"
           >
-          <router-link
-            to="/"
-            class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-600 hover:text-white"
-            >Log out</router-link
-          >
+            Log out
+          </button>
         </div>
       </div>
     </div>
@@ -122,6 +118,17 @@ export default {
       dropdownOpen,
       displayName
     };
+  },
+  methods: {
+    logout() {
+      console.log("clearing local storage");
+      window.localStorage.clear();
+      console.log(
+        "Display name should be null and is :",
+        window.localStorage.getItem(Constants.DISPLAYNAME)
+      );
+      this.$router.push("/");
+    }
   }
 };
 </script>

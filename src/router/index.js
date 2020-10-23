@@ -24,14 +24,10 @@ const routes = [
     meta: { layout: "empty" }
   },
   {
-    path: "/chat/:thread_id",
-    name: "ChatThread",
-    component: Chat
-  },
-  {
     path: "/chat",
     name: "Chat",
-    component: Chat
+    component: Chat,
+    meta: { layout: "chat" }
   },
   {
     path: "/dashboard",

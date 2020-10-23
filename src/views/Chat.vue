@@ -1,39 +1,24 @@
 <template>
   <Suspense>
     <template #default>
-      <div>
-        <Header />
-        <Threads :thread="thread_id" />
-      </div>
+      <ChatView />
     </template>
     <template #fallback>
       <div>Loading...</div>
     </template>
   </Suspense>
 </template>
-
 <script>
-import { ref } from "vue";
-import Header from "./../components/chat/Header.vue";
-import Threads from "./../components/chat/Threads.vue";
+import ChatView from "./../components/chat/ChatView";
+import * as Constants from "./../constants/LocalStorageConstants.js";
 export default {
-  setup() {
-    const thread_id = ref("");
-    return { thread_id };
+  mounted() {
+    if (!window.localStorage.getItem(Constants.SEED)) {
+      this.$router.push("/");
+    }
   },
   components: {
-    Header,
-    Threads
-  },
-  created() {
-    console.log("Mounted with Thread ID", this.$route.params.thread_id);
-    this.thread_id = this.$route.params.thread_id;
-  },
-  methods: {
-    getID() {
-      console.log("Params ID:", this.$route.params.thread_id);
-      this.thread_id = this.$route.params.thread_id;
-    }
+    ChatView
   }
 };
 </script>

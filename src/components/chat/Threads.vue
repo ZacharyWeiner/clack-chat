@@ -1,35 +1,47 @@
 <template>
   <div>
+    {{tControlThreadID}}
     <div :v-if="revs && revs.length > 0">
-      <div v-for="rev in revs" :key="rev">{{ rev }}</div>
+      <div v-for="rev in revs" :key="rev">
+        <button @click.prevent="viewChat(rev)" :class="buttonClass">
+          {{ rev.substring(0, 4) }} ...
+          {{ rev.substring(rev.length - 6, rev.length) }}
+        </button>
+      </div>
     </div>
   </div>
 </template>
 <script>
-import { ref } from "vue";
-import Computer from "bitcoin-computer";
-import * as Constants from "./../../constants/LocalStorageConstants.js";
+import { ref, inject } from "vue";
 export default {
   name: "Threads",
   async setup(props) {
-    console.log("Props for Threads", props);
-    if (props.thread) {
-      console.log("ThreadID:", props.thread);
-    }
-    const _computer = new Computer({
-      chain: "BSV",
-      network: "testnet",
-      seed: window.localStorage.getItem(Constants.SEED)
-    });
-    const computer = _computer;
-    const pubKey = computer.db.wallet.getPublicKey();
-    let _revs = await computer.getRevs(pubKey);
-    let revs = ref(_revs);
+    const tControlThreadID = inject("thread_id", "");
 
+    console.log("Props for Threads", tControlThreadID);
+    if (tControlThreadID) {
+      console.log("ThreadID:", tControlThreadID);
+    }
+    const pubKey = props.computer.db.wallet.getPublicKey();
+    let _revs = await props.computer.getRevs(pubKey);
+    let revs = ref(_revs);
     console.log(revs);
-    return { revs };
+    return { revs, tControlThreadID };
   },
-  props: ["thread"]
+  methods: {
+    viewChat(rev) {
+      console.log("clicked with rev");
+      try {
+        this.$router.push({ name: "ChatThread", params: { thread_id: rev } });
+      } catch (err) {
+        alert(err);
+      }
+    },
+    buttonClass(_rev) {
+      if (this.rev === _rev) return "bg-blue-500";
+    }
+  },
+  props: ["thread", "computer"]
 };
 </script>
 <style scoped></style>
