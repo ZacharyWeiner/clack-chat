@@ -24,13 +24,13 @@ const routes = [
     meta: { layout: "empty" }
   },
   {
-    path: "/chat",
+    path: "/chat/:id",
     name: "Chat",
     component: Chat,
     meta: { layout: "chat" }
   },
   {
-    path: "/chat/:id",
+    path: "/chat",
     name: "Chat",
     component: Chat,
     meta: { layout: "chat" }

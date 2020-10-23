@@ -1,57 +1,47 @@
 <template>
   <div>
-    <div class="flex mb-4 h-full">
-      <div class="w-1/4 bg-gray-100 h-12">
-        <button @click="open = true" class="btn btn-primary w-full">
+    <div class="flex mb-4 float-right">
+      <div class="bg-gray-100 h-12 ">
+        <button @click="open = true" class="btn btn-primary w-full float-right">
           + New Chat
         </button>
-        <h3 class="px-6 text-3xl">Chats</h3>
-        <div v-for="rev in revs" :key="rev">
-          <button
-            @click="changeThread(rev)"
-            class="btn w-full mt-1 bg-gradient-to-r from-indigo-400 to-blue-500 text-white"
-          >
-            {{ getShortRev(rev) }}
-          </button>
-        </div>
+        <!--  -->
       </div>
-      <div class="w-3/4 h-12 px-12">
-        <div v-if="threadTitle !== ''">
-          <h3 class="px-6 text-4xl">{{ threadTitle }}</h3>
-          <div
-            class="border-2 border-dashed border-gray-400 rounded-lg h-96"
-          ></div>
-        </div>
-        <div v-for="m in messages" :key="m">
-          <div class="rounded  overflow-hidden shadow-lg mt-6">
-            <div class="px-6 py-4">
-              <div class="text-gray-900 font-bold text-xl mb-2">
-                {{ m.split(":")[1] }} - <small>{{ m.split(":")[3] }}</small>
-              </div>
-              <p class="text-gray-700 text-lg text-base">
-                {{ m.split(":")[2] }}
-              </p>
+    </div>
+    <div class="w-full h-12 px-12">
+      <div v-if="threadTitle !== ''">
+        <h3 class="px-6 text-4xl">{{ threadTitle }}</h3>
+        <div
+          class="border-2 border-dashed border-gray-400 rounded-lg h-96"
+        ></div>
+      </div>
+      <div v-for="m in messages" :key="m">
+        <div class="rounded  overflow-hidden shadow-lg mt-6">
+          <div class="px-6 py-4">
+            <div class="text-gray-900 font-bold text-xl mb-2">
+              {{ m.split(":")[1] }} - <small>{{ m.split(":")[3] }}</small>
             </div>
+            <p class="text-gray-700 text-lg text-base">
+              {{ m.split(":")[2] }}
+            </p>
           </div>
         </div>
-        <div v-if="showNewMessage">
-          <textarea
-            class="form-textarea w-full mt-6 rounded-md border-indigo-600 bg-gray-100"
-            rows="3"
-            v-model="newMessage"
-            placeholder="New Message..."
-          />
-          <button
-            @click.prevent="sendMessage"
-            class="btn btn-primary float-right"
-          >
-            <i class="fa fa-paper-plane mr-3"></i> Send
-          </button>
-        </div>
+      </div>
+      <div v-if="showNewMessage">
+        <textarea
+          class="form-textarea w-full mt-6 rounded-md border-indigo-600 bg-gray-100"
+          rows="3"
+          v-model="newMessage"
+          placeholder="New Message..."
+        />
+        <button
+          @click.prevent="sendMessage"
+          class="btn btn-secondary float-right">
+          <i class="fa fa-paper-plane mr-3"></i> Send
+        </button>
       </div>
     </div>
   </div>
-  {{ revList }}
   <div
     :class="
       `modal ${!open &&
@@ -108,18 +98,18 @@
   </div>
 </template>
 <script>
-import { inject, readonly, ref } from "vue";
+import { inject, ref } from "vue";
 import Computer from "bitcoin-computer";
 import * as Constants from "./../../constants/LocalStorageConstants.js";
 import FileUtils from "@/utilities/FileUtils.js";
 export default {
-  async setup() {
-    const revList = inject(readonly("revList"));
+  async setup(props) {
+    const revList = inject("revList");
     const updateRevList = inject("updateRevList");
     let messagesList = ["none"];
     const messages = ref(messagesList);
     const open = ref(false);
-    const threadId = ref("");
+    const threadId = ref(props.selectedThread);
     const newMessage = ref("");
     const showNewMessage = ref(false);
     const threadTitle = ref("");
@@ -152,13 +142,32 @@ export default {
       revList
     };
   },
+  data: function() {
+    return {
+      polling: null
+    };
+  },
   mounted() {
     console.log("Chat Vue was mounted");
     if (this.$route.params.id) {
       this.changeThread(this.$route.params.id);
     }
   },
+  created() {
+    this.pollData();
+  },
   methods: {
+    pollData() {
+      this.polling = setInterval(() => {
+        console.log("settimeout running");
+        let _saved = window.localStorage.getItem("SelectedThread");
+        console.log("Saved: ", _saved, "this.Thread:", this.threadId);
+        if (_saved && _saved != this.threadId) {
+          this.changeThread(window.localStorage.getItem("SelectedThread"));
+        }
+        console.log("settimeout ended");
+      }, 3000);
+    },
     async createNewChatThread() {
       console.log("doing this now");
       try {
@@ -202,7 +211,8 @@ export default {
         _rev.length - 2
       )}`;
     }
-  }
+  },
+  props: ["selectedThread"]
 };
 </script>
 <style></style>

@@ -63,7 +63,7 @@
           <span class="mx-4">Dashboard</span>
         </router-link>
 
-        <router-link
+        <!-- <router-link
           class="flex items-center mt-4 py-2 px-6 border-l-4"
           :class="[$route.name === 'UIElements' ? activeClass : inactiveClass]"
           to="/ui-elements"
@@ -173,30 +173,38 @@
           </svg>
 
           <span class="mx-4">Modal</span>
-        </router-link>
+        </router-link> -->
 
         <div v-for="rev in revList" :key="rev">
-          <router-link
-            class="flex items-center mt-4 py-2 px-6 border-l-4"
+          <button
+            class="flex w-full items-center mt-4 py-2 px-6 border-l-4"
             :class="[$route.name === 'Blank' ? activeClass : inactiveClass]"
-            :to="`/chat/${rev}`"
+            @click.prevent="updateThread(rev)"
           >
             <i class="fas fa-comments"></i>
 
             <span class="mx-4">{{ rev.substring(0, 8) }}</span>
-          </router-link>
+          </button>
+        </div>
+        <div v-if="loading">
+          <h1 class="text-white">Loading Conversation...</h1>
         </div>
       </nav>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, inject, ref } from "vue";
+<script>
+import { inject, ref } from "vue";
 import { useSidebar } from "../hooks/useSidebar";
 
-export default defineComponent({
-  setup() {
+export default {
+  async setup() {
+    const loading = ref(false);
+    const revList = inject("revList");
+    const selectedThread = inject("selectedThread");
+    const updateSelectedThread = inject("updateSelectedThread");
+    console.log("Selected Thread on Sidebar:", selectedThread.value);
     const { isOpen } = useSidebar();
     const activeClass = ref(
       "bg-gray-600 bg-opacity-25 text-gray-100 border-gray-100"
@@ -204,14 +212,27 @@ export default defineComponent({
     const inactiveClass = ref(
       "border-gray-900 text-gray-500 hover:bg-gray-600 hover:bg-opacity-25 hover:text-gray-100"
     );
-    const revList = inject("revList");
-
     return {
       isOpen,
       activeClass,
       inactiveClass,
-      revList
+      revList,
+      selectedThread,
+      updateSelectedThread,
+      loading
     };
+  },
+  methods: {
+    async updateThread(rev) {
+      this.loading = true;
+      console.log('SET loading to true');
+      this.updateSelectedThread(rev);
+      console.log("Update From Sidebard CLicked:", rev);
+      window.localStorage.setItem("SelectedThread", rev);
+      setInterval(() => {
+        this.loading = false;
+      }, 3000);
+    }
   }
-});
+};
 </script>

@@ -4,11 +4,11 @@
   </component>
 </template>
 
-<script lang="ts">
+<script>
 import { computed } from "vue";
 import { useRouter } from "vue-router";
 
-const defaultLayout = "default";
+const defaultLayout = "chat";
 
 export default {
   setup() {
