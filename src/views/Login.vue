@@ -56,19 +56,23 @@
         </label>
 
         <div class="flex justify-between items-center mt-4">
-          <div>
+          <!-- <div>
             <label class="inline-flex items-center">
-              <input type="checkbox" class="form-checkbox text-indigo-600" />
+              <input
+                type="checkbox"
+                class="form-checkbox text-indigo-600"
+                :checked="checked"
+              />
               <span class="mx-2 text-gray-600 text-sm">Remember me</span>
             </label>
-          </div>
+          </div> -->
 
           <div>
-            <a
+            <!-- <a
               class="block text-sm fontme text-indigo-700 hover:underline"
               href="#"
               >Forgot your password?</a
-            >
+            > -->
           </div>
         </div>
 
@@ -96,6 +100,7 @@ export default defineComponent({
     const router = useRouter();
     const displayName = ref("johndoe@mail.com");
     const password = ref("");
+    const checked = ref("");
 
     const login = async (name, pass) => {
       if (!pass) {
@@ -132,7 +137,8 @@ export default defineComponent({
     return {
       login,
       displayName,
-      password
+      password,
+      checked
     };
   }
 });
