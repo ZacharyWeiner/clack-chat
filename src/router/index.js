@@ -51,7 +51,7 @@ const routes = [
     path: "/cards",
     name: "Cards",
     component: Card,
-    meta: { layout: "dashboard" }
+    meta: { layout: "default" }
   },
   {
     path: "/tables",
