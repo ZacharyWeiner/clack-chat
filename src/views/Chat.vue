@@ -12,8 +12,6 @@
               </div>
 
               <div v-if="!loading">
-                {{ selectedThread }}
-                {{ balance }}
                 <div class="flex mb-4 float-right">
                   <div class="bg-gray-100 h-12 ">
                     <button
@@ -24,8 +22,11 @@
                     </button>
                   </div>
                 </div>
-                <Messages :messages="messages" />
-                <SendMessage />
+                <div v-if="thread && thread.title">
+                  <span class="text-4xl">{{ thread.title }}</span>
+                  <Messages :messages="messages" />
+                  <SendMessage />
+                </div>
               </div>
             </div>
           </main>
@@ -40,48 +41,110 @@
             ></div>
 
             <div
-              class="modal-container bg-white w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto"
+              class="modal-container w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto"
             >
               <!-- Add margin if you want to see some of the overlay behind the modal-->
               <div class="modal-content py-4 text-left px-6">
-                <!--Title-->
-                <div class="flex justify-between items-center pb-3">
-                  <p class="text-2xl font-bold">Create A New Chat Thread</p>
-                  <div
-                    class="modal-close cursor-pointer z-50"
-                    @click="open = false"
-                  >
-                    <svg
-                      class="fill-current text-black"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="18"
-                      height="18"
-                      viewBox="0 0 18 18"
-                    >
-                      <path
-                        d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"
-                      />
-                    </svg>
-                  </div>
-                </div>
-
                 <!--Body-->
-                <p>Modal content.</p>
+                <div
+                  class="max-w-sm w-full bg-white shadow-md rounded-md overflow-hidden border"
+                >
+                  <form>
+                    <div
+                      class="flex justify-between items-center px-5 py-3 text-gray-700 border-b"
+                    >
+                      <h3 class="text-xl">Create a New Thread</h3>
+                      <button @click="open = false">
+                        <svg
+                          class="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12"
+                          />
+                        </svg>
+                      </button>
+                    </div>
 
-                <!--Footer-->
-                <div class="flex justify-end pt-2">
-                  <button
-                    @click="open = false"
-                    class="px-6 py-3 bg-transparent p-3 rounded-lg text-indigo-500 hover:bg-gray-100 hover:text-indigo-400 mr-2"
-                  >
-                    Close
-                  </button>
-                  <button
-                    @click="createNewChatThread"
-                    class="px-6 py-3 bg-indigo-600 rounded-md text-white font-medium tracking-wide hover:bg-indigo-500"
-                  >
-                    Save
-                  </button>
+                    <div class="px-1 py-2 bg-gray-200 text-gray-700 border-b">
+                      <label class="text-xs">Name Your New Thread</label>
+
+                      <div class="mt-2 relative rounded-md shadow-sm">
+                        <span
+                          class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-600"
+                        >
+                          <svg
+                            class="h-6 w-6"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"
+                            />
+                          </svg>
+                        </span>
+
+                        <input
+                          v-model="chatTitle"
+                          type="text"
+                          class="form-input w-full px-12 py-2 appearance-none rounded-md focus:border-indigo-600"
+                        />
+                      </div>
+                    </div>
+                    <div class="px-1 py-1 bg-gray-200 text-gray-700 border-b">
+                      <label class="text-xs">Invite With Public Key</label>
+
+                      <div class="mt-2 relative rounded-md shadow-sm">
+                        <span
+                          class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-600"
+                        >
+                          <svg
+                            class="h-6 w-6"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"
+                            />
+                          </svg>
+                        </span>
+
+                        <input
+                          type="text"
+                          class="form-input w-full px-12 py-2 appearance-none rounded-md focus:border-indigo-600"
+                          v-model="to"
+                        />
+                      </div>
+                    </div>
+
+                    <div class="flex justify-between items-center px-5 py-3">
+                      <button
+                        @click="open = false"
+                        class="px-3 py-1 text-gray-700 text-sm rounded-md bg-gray-200 hover:bg-gray-300 focus:outline-none"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        @click.prevent="createNewChatThread(chatTitle, to, pk)"
+                        class="px-3 py-1 bg-indigo-600 text-white rounded-md text-sm hover:bg-indigo-500 focus:outline-none"
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </form>
                 </div>
               </div>
             </div>
@@ -119,6 +182,8 @@ export default {
     const loading = ref(false);
     const open = ref(false);
     const balance = ref(0);
+    const to = ref("");
+    const chatTitle = ref("");
     const computer = new Computer({
       chain: "BSV",
       seed: seed
@@ -179,7 +244,10 @@ export default {
       messages,
       updateMessages,
       thread,
-      updateThread
+      updateThread,
+      to,
+      chatTitle,
+      pk
     };
   },
   mounted() {
@@ -230,20 +298,21 @@ export default {
         }
       }, 3000);
     },
-    async createNewChatThread() {
-      console.log("doing this now");
+    async createNewChatThread(chatTitle, to, pk) {
+      console.log(chatTitle + " : " + pk + " : " + to);
       try {
         let _contract = await FileUtils.importFromPublic("chat-thread.js");
         let thread_rev = await this.computer.new(_contract, [
-          this.pk,
+          [pk, to],
           "clack.chat",
-          "Some Thread"
+          chatTitle
         ]);
+        this.open = false;
         console.log("Thread Created: ", thread_rev);
       } catch (err) {
         alert(err);
+        this.open = false;
       }
-      this.open = false;
     }
   }
 };

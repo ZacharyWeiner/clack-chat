@@ -1,10 +1,18 @@
 <template>
-  <div class="rounded  overflow-hidden shadow-lg mt-6">
-    <div class="px-6 py-4">
-      <div class="text-gray-900 font-bold text-xl mb-2">
-        {{ m.split(":")[1] }} - <small>{{ m.split(":")[3] }}</small>
+  <div class="flex items-start mb-4 text-sm">
+    <img
+      src="https://twitter.com/davidhemphill/profile_image"
+      class="w-10 h-10 rounded mr-3"
+    />
+    <div class="flex-1 overflow-hidden">
+      <div>
+        <span class="font-bold">{{ m.split(":")[1] }}</span>
+        <span class="text-grey text-xs"
+          >{{ m.split(":")[3] }}:{{ m.split(":")[4] }} :
+          {{ m.split(":")[5] }}</span
+        >
       </div>
-      <p class="text-gray-700 text-lg text-base">
+      <p class="text-black leading-normal">
         {{ m.split(":")[2] }}
       </p>
     </div>

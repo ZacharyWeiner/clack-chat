@@ -4,11 +4,11 @@ export default class Chat {
     this.contractTypeName = "Chat";
     this.contractTypeVersion = "0.0.1";
     this.originalChannel = oc;
-    this._owners = [publicKey];
+    this._owners = publicKey;
     this.title = title;
     this.messages = [];
     this.lastUpdated = null;
-    this.canArchive = [publicKey];
+    this.canArchive = publicKey;
     this.archived = false;
   }
 
