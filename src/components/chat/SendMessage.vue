@@ -1,7 +1,18 @@
 <template>
   <div>
-    <input type="textarea" v-model="newMessage" />
-    <button @click.prevent="sendMessage(newMessage)">Send Message</button>
+    <textarea
+      v-model="newMessage"
+      class="form-textarea w-full mt-6 rounded-md border-indigo-600 bg-gray-100"
+      rows="3"
+      placeholder="Your message here..."
+    />
+    <button
+      class="btn btn-secondary float-right"
+      @click.prevent="sendMessage(newMessage)"
+    >
+      <i class="fa fa-paper-plane mr-3"></i>
+      Send Message
+    </button>
   </div>
 </template>
 <script>
@@ -14,7 +25,9 @@ export default {
     const pk = inject(PIConstants.PUBLIC_KEY);
     const computer = inject(PIConstants.COMPUTER);
     const threadId = inject(PIConstants.SELECTED_THREAD_ID_KEY);
-    const updateSelectedThread = inject(PIConstants.UPDATE_SELECTED_REV_FUNCTION);
+    const updateSelectedThread = inject(
+      PIConstants.UPDATE_SELECTED_REV_FUNCTION
+    );
     return { computer, newMessage, threadId, pk, updateSelectedThread };
   },
   methods: {
