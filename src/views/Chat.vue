@@ -22,10 +22,10 @@
                     >
                       + New Chat
                     </button>
-                    <!--  -->
                   </div>
                 </div>
                 <Messages :messages="messages" />
+                <SendMessage />
               </div>
             </div>
           </main>
@@ -104,6 +104,7 @@ import * as PIConstants from "./../constants/ProvideInjectConstants.js";
 import Computer from "bitcoin-computer";
 import Header from "./../components/Header";
 import Sidebar from "./../components/chat/Sidebar";
+import SendMessage from "./../components/chat/SendMessage";
 import FileUtils from "@/utilities/FileUtils.js";
 
 export default {
@@ -111,6 +112,7 @@ export default {
     let seed = window.localStorage.getItem(LSConstants.SEED);
     const revList = ref(["nothing yet"]);
     const messages = ref(["nothing yet"]);
+    const thread = ref(null);
     //if there is a thread selected, init sync
     const selectedThread = ref(window.localStorage.getItem("SelectedThread"));
     const threadId = ref("");
@@ -134,7 +136,12 @@ export default {
     const updateSelectedThread = _id => {
       window.localStorage.setItem("SelectedThread", _id);
       selectedThread.value = _id;
-      console.log("Updated Selected Thread From Sidebar:", _id);
+      console.log("updateSelectedThread() on Chat.vue Triggered:", _id);
+    };
+
+    const updateThread = _thread => {
+      thread.value = _thread;
+      console.log("Updated Thread ", _thread);
     };
 
     const updateMessages = arr => {
@@ -149,13 +156,15 @@ export default {
     provide(PIConstants.COMPUTER, computer);
     provide("revList", revList);
     provide("loading", loading);
-    provide("selectedThread", selectedThread);
-    provide("userPK", pk);
+    provide(PIConstants.SELECTED_THREAD_ID_KEY, selectedThread);
+    provide(PIConstants.PUBLIC_KEY, pk);
+    provide(PIConstants.THREAD_KEY, thread);
     provide(PIConstants.MESSAGES_KEY, messages);
     provide(PIConstants.UPDATE_REV_LIST_FUNCTION, updateRevList);
     provide(PIConstants.UPDATE_LOADING_FUNCTION, updateLoading);
     provide(PIConstants.UPDATE_SELECTED_REV_FUNCTION, updateSelectedThread);
     provide(PIConstants.UPDATE_MESSAGES_FUNCTION, updateMessages);
+    provide(PIConstants.UPDATE_THREAD_FUNCTION, updateThread);
     return {
       selectedThread,
       computer,
@@ -168,7 +177,9 @@ export default {
       balance,
       revList,
       messages,
-      updateMessages
+      updateMessages,
+      thread,
+      updateThread
     };
   },
   mounted() {
@@ -184,7 +195,8 @@ export default {
   components: {
     Messages,
     Header,
-    Sidebar
+    Sidebar,
+    SendMessage
   },
   data: function() {
     return {
@@ -208,6 +220,7 @@ export default {
       this.pollingMessages = setInterval(async () => {
         if (this.selectedThread) {
           this.computer.sync(this.selectedThread).then(r => {
+            this.updateThread(r);
             this.updateMessages(r.messages);
             console.log("Messages Loaded:", r.messages);
           });

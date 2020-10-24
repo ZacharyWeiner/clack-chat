@@ -91,7 +91,7 @@ export default {
   async setup() {
     const revList = inject("revList");
     const updateLoading = inject(PIConstants.UPDATE_LOADING_FUNCTION);
-    const selectedThread = inject("selectedThread");
+    const selectedThread = inject(PIConstants.SELECTED_THREAD_ID_KEY);
     const loading = inject("loading");
     const updateSelectedThread = inject(
       PIConstants.UPDATE_SELECTED_REV_FUNCTION
@@ -118,7 +118,6 @@ export default {
   methods: {
     async updateThread(rev) {
       this.updateLoading(true);
-      console.log("SET loading to true");
       this.updateSelectedThread(rev);
       console.log("Update From Sidebard Clicked:", rev);
     }
