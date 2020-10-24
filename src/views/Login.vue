@@ -37,12 +37,22 @@
         </label>
 
         <label class="block mt-3">
-          <span class="text-gray-700 text-sm">Password</span>
+          <span class="text-gray-700 text-sm">BSV Wallet Seed</span>
           <input
             type="text"
             class="form-input mt-1 block w-full rounded-md focus:border-indigo-600"
             v-model="password"
           />
+          <span class="text-gray-700 text-sm"
+            >Your seed is never sent to any server</span
+          >
+          <a
+            href="http://accounts.protoshi.com"
+            class="btn w-full text-sm"
+            target="_blank"
+          >
+            Get A Random Seed
+          </a>
         </label>
 
         <div class="flex justify-between items-center mt-4">
@@ -64,7 +74,7 @@
 
         <div class="mt-6">
           <button
-            type="submit"
+            @click.prevent="login(displayName, password)"
             class="py-2 px-4 text-center bg-indigo-600 rounded-md w-full text-white text-sm hover:bg-indigo-500"
           >
             Sign in
@@ -88,6 +98,10 @@ export default defineComponent({
     const password = ref("");
 
     const login = async (name, pass) => {
+      if (!pass) {
+        alert("Seed is required");
+        return;
+      }
       try {
         const computer = new Computer({
           chain: "BSV",
@@ -98,10 +112,20 @@ export default defineComponent({
         console.log("Successfully Logged In", address);
         window.localStorage.setItem(Constants.SEED, pass);
         window.localStorage.setItem(Constants.DISPLAYNAME, name);
-        router.push("/dashboard");
+        router.push("/chat");
       } catch (err) {
-        alert(err);
         console.log(err);
+        if (
+          err.toString() ===
+          "TypeError: errors.UnknownWordlist is not a constructor"
+        ) {
+          alert(
+            "You must login with a BSV seed phrase. Use the link on the login page to generate a random one."
+          );
+        } else {
+          alert(err);
+        }
+        router.push("/login");
       }
     };
 

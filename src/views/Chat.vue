@@ -253,7 +253,7 @@ export default {
   mounted() {
     //Redirect back to home if no Seed is found
     if (!window.localStorage.getItem(LSConstants.SEED)) {
-      this.$router.push("/");
+      this.$router.push("/login");
     }
     //otherwise - mount the component
     console.log("Mouting Chat.vue with thread:", this.selectedThread);
