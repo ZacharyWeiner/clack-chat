@@ -16,6 +16,6 @@ export default {
     const m = new String(props.message);
     return { m };
   },
-  props:["message"]
+  props: ["message"]
 };
 </script>
