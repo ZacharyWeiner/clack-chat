@@ -8,7 +8,7 @@
 import { computed } from "vue";
 import { useRouter } from "vue-router";
 
-const defaultLayout = "chat";
+const defaultLayout = "default";
 
 export default {
   setup() {

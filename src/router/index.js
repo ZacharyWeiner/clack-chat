@@ -38,17 +38,20 @@ const routes = [
   {
     path: "/dashboard",
     name: "Dashboard",
-    component: Dashboard
+    component: Dashboard,
+    meta: { layout: "default" }
   },
   {
     path: "/forms",
     name: "Forms",
-    component: Forms
+    component: Forms,
+    meta: { layout: "default" }
   },
   {
     path: "/cards",
     name: "Cards",
-    component: Card
+    component: Card,
+    meta: { layout: "dashboard" }
   },
   {
     path: "/tables",

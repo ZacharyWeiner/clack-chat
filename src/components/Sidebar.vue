@@ -34,7 +34,9 @@
             />
           </svg>
 
-          <span class="text-white text-2xl mx-2 font-semibold">Clack</span>
+          <span class="text-white text-2xl mx-2 font-semibold"
+            >[Brand Here]</span
+          >
         </div>
       </div>
 
@@ -63,7 +65,7 @@
           <span class="mx-4">Dashboard</span>
         </router-link>
 
-        <!-- <router-link
+        <router-link
           class="flex items-center mt-4 py-2 px-6 border-l-4"
           :class="[$route.name === 'UIElements' ? activeClass : inactiveClass]"
           to="/ui-elements"
@@ -173,42 +175,31 @@
           </svg>
 
           <span class="mx-4">Modal</span>
-        </router-link> -->
+        </router-link>
 
-        <div v-for="rev in revList" :key="rev">
-          <button
-            class="flex w-full items-center mt-4 py-2 px-6 border-l-4"
-            :class="[$route.name === 'Blank' ? activeClass : inactiveClass]"
-            @click.prevent="updateThread(rev)"
-          >
-            <i class="fas fa-comments"></i>
+        <router-link
+          class="flex items-center mt-4 py-2 px-6 border-l-4"
+          :class="[$route.name === 'Blank' ? activeClass : inactiveClass]"
+          to="/blank"
+        >
+          <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"
+            />
+          </svg>
 
-            <span class="mx-4">{{ rev.substring(0, 8) }}</span>
-          </button>
-        </div>
-        <div v-if="loading">
-          <i class="fas fa-spinner animate-spin"></i>
-        </div>
+          <span class="mx-4">Blank</span>
+        </router-link>
       </nav>
     </div>
   </div>
 </template>
 
-<script>
-import { inject, ref } from "vue";
+<script lang="ts">
+import { defineComponent, ref } from "vue";
 import { useSidebar } from "../hooks/useSidebar";
-import * as PIConstants from "./../constants/ProvideInjectConstants.js";
-
-export default {
-  async setup() {
-    const updateLoading = inject(PIConstants.UPDATE_LOADING_FUNCTION);
-    const revList = inject("revList");
-    const selectedThread = inject("selectedThread");
-    const loading = inject("loading");
-    const updateSelectedThread = inject(
-      PIConstants.UPDATE_SELECTED_REV_FUNCTION
-    );
-    console.log("Selected Thread on Sidebar:", selectedThread.value);
+export default defineComponent({
+  setup() {
     const { isOpen } = useSidebar();
     const activeClass = ref(
       "bg-gray-600 bg-opacity-25 text-gray-100 border-gray-100"
@@ -219,23 +210,8 @@ export default {
     return {
       isOpen,
       activeClass,
-      inactiveClass,
-      revList,
-      selectedThread,
-      updateSelectedThread,
-      updateLoading,
-      loading
+      inactiveClass
     };
-  },
-  methods: {
-    async updateThread(rev) {
-      this.updateLoading(true);
-      console.log("SET loading to true");
-      this.updateSelectedThread(rev);
-      console.log("Update From Sidebard Clicked:", rev);
-      window.localStorage.setItem("SelectedThread", rev);
-      this.updateLoading(false);
-    }
   }
-};
+});
 </script>

@@ -143,10 +143,10 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from "vue";
+<script >
+import { ref } from "vue";
 
-export default defineComponent({
+export default {
   setup() {
     const user = ref({
       username: "",
@@ -165,5 +165,5 @@ export default defineComponent({
       register
     };
   }
-});
+};
 </script>
