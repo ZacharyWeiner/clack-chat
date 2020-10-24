@@ -187,7 +187,7 @@
           </button>
         </div>
         <div v-if="loading">
-          <h1 class="text-white">Loading Conversation...</h1>
+          <i class="fas fa-spinner animate-spin"></i>
         </div>
       </nav>
     </div>
@@ -197,13 +197,17 @@
 <script>
 import { inject, ref } from "vue";
 import { useSidebar } from "../hooks/useSidebar";
+import * as PIConstants from "./../constants/ProvideInjectConstants.js";
 
 export default {
   async setup() {
-    const loading = ref(false);
+    const updateLoading = inject(PIConstants.UPDATE_LOADING_FUNCTION);
     const revList = inject("revList");
     const selectedThread = inject("selectedThread");
-    const updateSelectedThread = inject("updateSelectedThread");
+    const loading = inject("loading");
+    const updateSelectedThread = inject(
+      PIConstants.UPDATE_SELECTED_REV_FUNCTION
+    );
     console.log("Selected Thread on Sidebar:", selectedThread.value);
     const { isOpen } = useSidebar();
     const activeClass = ref(
@@ -219,19 +223,18 @@ export default {
       revList,
       selectedThread,
       updateSelectedThread,
+      updateLoading,
       loading
     };
   },
   methods: {
     async updateThread(rev) {
-      this.loading = true;
-      console.log('SET loading to true');
+      this.updateLoading(true);
+      console.log("SET loading to true");
       this.updateSelectedThread(rev);
-      console.log("Update From Sidebard CLicked:", rev);
+      console.log("Update From Sidebard Clicked:", rev);
       window.localStorage.setItem("SelectedThread", rev);
-      setInterval(() => {
-        this.loading = false;
-      }, 3000);
+      this.updateLoading(false);
     }
   }
 };
