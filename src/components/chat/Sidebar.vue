@@ -34,45 +34,39 @@
             />
           </svg>
 
-          <span class="text-white text-2xl mx-2 font-semibold">Clack</span>
+          <span class="text-white text-2xl mx-2 font-semibold">ClackChat</span>
         </div>
       </div>
 
       <nav class="mt-10">
-        <router-link
+        <button
           class="flex items-center mt-4 py-2 px-6 border-l-4"
           :class="[$route.name === 'Dashboard' ? activeClass : inactiveClass]"
-          to="/dashboard"
+          @click.prevent="showNewChatModal"
         >
-          <svg
-            class="h-5 w-5"
-            viewBox="0 0 20 20"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M2 10C2 5.58172 5.58172 2 10 2V10H18C18 14.4183 14.4183 18 10 18C5.58172 18 2 14.4183 2 10Z"
-              fill="currentColor"
-            />
-            <path
-              d="M12 2.25195C14.8113 2.97552 17.0245 5.18877 17.748 8.00004H12V2.25195Z"
-              fill="currentColor"
-            />
-          </svg>
+          <i class="fa fa-plus h-5 w-5"></i>
 
-          <span class="mx-4">Dashboard</span>
-        </router-link>
+          <span class="mx-4 text-lg"> New Chat</span>
+        </button>
+        <button
+          class="flex items-center mt-4 py-2 px-6 border-l-4"
+          :class="[$route.name === 'Dashboard' ? activeClass : inactiveClass]"
+          @click.prevent=""
+        >
+          <i class="fas fa-comments h-5 w-5"></i>
 
-        <div v-for="rev in revList" :key="rev">
-          <button
-            class="flex w-full items-center mt-4 py-2 px-6 border-l-4"
-            :class="[$route.name === 'Blank' ? activeClass : inactiveClass]"
-            @click.prevent="updateThread(rev)"
-          >
-            <i class="fas fa-comments"></i>
-
-            <span class="mx-4">{{ rev.substring(0, 8) }}</span>
-          </button>
+          <span class="mx-4 text-lg "> My Threads</span>
+        </button>
+        <div class="overflow-y-auto h-132 bg-gray-800 rounded mx-4">
+          <div v-for="rev in revList" :key="rev">
+            <button
+              class="flex w-full items-center mt-4 mb-4"
+              :class="[$route.name === 'Blank' ? activeClass : inactiveClass]"
+              @click.prevent="updateThread(rev)"
+            >
+              <span class="mx-5 px-5">{{ rev.substring(0, 8) }}</span>
+            </button>
+          </div>
         </div>
         <div v-if="loading">
           <i class="fas fa-spinner animate-spin"></i>
@@ -92,6 +86,7 @@ export default {
     const revList = inject("revList");
     const updateLoading = inject(PIConstants.UPDATE_LOADING_FUNCTION);
     const selectedThread = inject(PIConstants.SELECTED_THREAD_ID_KEY);
+    const showNewChatModal = inject(PIConstants.SHOW_NEW_CHAT_MODAL_FUNCTION);
     const loading = inject("loading");
     const updateSelectedThread = inject(
       PIConstants.UPDATE_SELECTED_REV_FUNCTION
@@ -112,7 +107,8 @@ export default {
       updateSelectedThread,
       updateLoading,
       loading,
-      revList
+      revList,
+      showNewChatModal
     };
   },
   methods: {

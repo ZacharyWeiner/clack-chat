@@ -1,4 +1,4 @@
-# pack-test
+# clack.chat foundation app
 
 ## Project setup
 ```

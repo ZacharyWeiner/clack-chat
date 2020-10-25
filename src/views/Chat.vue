@@ -4,27 +4,40 @@
       <div class="flex h-screen bg-gray-200 font-roboto">
         <Sidebar />
         <div class="flex-1 flex flex-col overflow-hidden">
-          <Header />
+          <Header :title="threadTitle" />
           <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-200">
-            <div class="container mx-auto px-6 py-8">
+            <div class=" mx-auto px-6 py-1">
               <div v-if="loading">
-                Loading ...
-              </div>
+                <div
+                  :class="
+                    `modal z-50 fixed w-full h-full top-0 left-0 flex items-center justify-center`
+                  "
+                >
+                  <div class="modal-overlay absolute w-full h-full "></div>
 
-              <div v-if="!loading">
-                <div class="flex mb-4 float-right">
-                  <div class="bg-gray-100 h-12 ">
-                    <button
-                      @click="open = true"
-                      class="btn btn-primary w-full float-right"
-                    >
-                      + New Chat
-                    </button>
+                  <div
+                    class="modal-container w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto"
+                  >
+                    <!-- Add margin if you want to see some of the overlay behind the modal-->
+                    <div class="modal-content py-4 text-left px-6">
+                      <!--Body-->
+                      <div
+                        class="max-w-sm p-5 w-full bg-white shadow-md rounded-md overflow-hidden border z-51"
+                      >
+                        <i class="animate-spin fas fa-spinner text-4xl"></i><span class='text-xl mx-auto pl-10'> Loading</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div v-if="thread && thread.title">
-                  <span class="text-4xl">{{ thread.title }}</span>
-                  <Messages :messages="messages" />
+              </div>
+              <div v-if="!loading">
+                <div class="pb-5" v-if="thread && thread.title">
+                  <div
+                    v-if="messages.length > 0"
+                    class="pt-5 pb-3 pl-3 pr-3 bg-white rounded"
+                  >
+                    <Messages :messages="messages" />
+                  </div>
                   <SendMessage />
                 </div>
               </div>
@@ -153,7 +166,7 @@
       </div>
     </template>
     <template #fallback>
-      <div>Loading...</div>
+      <div><i class="fas fa-spinner text-xl"></i> YYY Loading...</div>
     </template>
   </Suspense>
 </template>
@@ -173,8 +186,8 @@ import FileUtils from "@/utilities/FileUtils.js";
 export default {
   setup() {
     let seed = window.localStorage.getItem(LSConstants.SEED);
-    const revList = ref(["nothing yet"]);
-    const messages = ref(["nothing yet"]);
+    const revList = ref(["Loading..."]);
+    const messages = ref([]);
     const thread = ref(null);
     //if there is a thread selected, init sync
     const selectedThread = ref(window.localStorage.getItem("SelectedThread"));
@@ -201,6 +214,7 @@ export default {
     const updateSelectedThread = _id => {
       window.localStorage.setItem("SelectedThread", _id);
       selectedThread.value = _id;
+      thread.value = null;
       console.log("updateSelectedThread() on Chat.vue Triggered:", _id);
     };
 
@@ -215,6 +229,9 @@ export default {
       if (loading.value) loading.value = false;
     };
 
+    const showNewChatModal = () => {
+      open.value = true;
+    };
     const pk = ref(computer.db.wallet.getPublicKey().toString());
     console.log("User PK:", pk);
 
@@ -230,6 +247,7 @@ export default {
     provide(PIConstants.UPDATE_SELECTED_REV_FUNCTION, updateSelectedThread);
     provide(PIConstants.UPDATE_MESSAGES_FUNCTION, updateMessages);
     provide(PIConstants.UPDATE_THREAD_FUNCTION, updateThread);
+    provide(PIConstants.SHOW_NEW_CHAT_MODAL_FUNCTION, showNewChatModal);
     return {
       selectedThread,
       computer,
@@ -247,7 +265,8 @@ export default {
       updateThread,
       to,
       chatTitle,
-      pk
+      pk,
+      showNewChatModal
     };
   },
   mounted() {
@@ -272,6 +291,16 @@ export default {
       pollingMessages: null
     };
   },
+  computed:{
+    threadTitle(){
+      if (this.thread){
+        return this.thread.title;
+      }else if (this.loading){
+        return "Loading ...";
+      }
+      return "Select A Chat";
+    }
+  },
   methods: {
     pollThreads() {
       this.polling = setInterval(async () => {
@@ -279,7 +308,12 @@ export default {
           .getBalance(this.pk)
           .then(r => (this.balance = r));
         this.computer.getRevs(this.pk).then(r => {
-          this.updateRevList(r);
+          console.log("Logging R:", r, r.length);
+          if (r.length > 0) {
+            this.updateRevList(r);
+          } else {
+            this.updateRevList(["Create A Chat To Start"]);
+          }
         });
         console.log("settimeout ended");
       }, 3000);
@@ -289,8 +323,10 @@ export default {
         if (this.selectedThread) {
           this.computer.sync(this.selectedThread).then(r => {
             this.updateThread(r);
-            this.updateMessages(r.messages);
-            console.log("Messages Loaded:", r.messages);
+            if (r.messages.length > 0) {
+              this.updateMessages(r.messages);
+              console.log("Messages Loaded:", r.messages);
+            }
           });
         }
         if (this.loading === true) {

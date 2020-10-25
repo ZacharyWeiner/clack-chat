@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-start mb-4 text-sm">
+  <div class="flex items-start pb-4 text-sm bg-gray-100 rounded">
     <img
       src="https://twitter.com/davidhemphill/profile_image"
       class="w-10 h-10 rounded mr-3"

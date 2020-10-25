@@ -24,6 +24,7 @@
       </button>
 
       <div class="relative mx-4 lg:mx-0">
+        <div class='text-3xl'> {{props.title}} </div>
         <!-- <span class="absolute inset-y-0 left-0 pl-3 flex items-center">
           <svg class="h-5 w-5 text-gray-500" viewBox="0 0 24 24" fill="none">
             <path
@@ -61,17 +62,17 @@
           />
         </svg>
       </button>
-      <div>{{ displayName }}</div>
+      <div  @click="dropdownOpen = !dropdownOpen">{{ displayName }}</div>
       <div class="relative">
         <button
           @click="dropdownOpen = !dropdownOpen"
           class="relative z-10 block h-8 w-8 rounded-full overflow-hidden shadow focus:outline-none"
         >
-          <img
+          <!-- <img
             class="h-full w-full object-cover"
             src="https://images.unsplash.com/photo-1528892952291-009c663ce843?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=296&q=80"
             alt="Your avatar"
-          />
+          /> -->
         </button>
         <div
           v-show="dropdownOpen"
@@ -83,11 +84,11 @@
           v-show="dropdownOpen"
           class="absolute right-0 mt-2 py-2 w-48 bg-white rounded-md shadow-xl z-20"
         >
-          <a
+          <!-- <a
             href="#"
             class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-600 hover:text-white"
             >Profile</a
-          >
+          > -->
           <button
             @click="logout"
             class="w-full block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-600 hover:text-white"
@@ -106,7 +107,7 @@ import { useSidebar } from "../hooks/useSidebar";
 import * as Constants from "./../constants/LocalStorageConstants";
 
 export default {
-  setup() {
+  setup(props) {
     const dropdownOpen = ref(false);
     const { isOpen } = useSidebar();
     let _dn = window.localStorage.getItem(Constants.DISPLAYNAME);
@@ -116,7 +117,8 @@ export default {
     return {
       isOpen,
       dropdownOpen,
-      displayName
+      displayName,
+      props
     };
   },
   methods: {
@@ -129,6 +131,7 @@ export default {
       );
       this.$router.push("/");
     }
-  }
+  },
+  props:['title']
 };
 </script>

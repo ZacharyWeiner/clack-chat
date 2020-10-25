@@ -11,7 +11,7 @@
       @click.prevent="sendMessage(newMessage)"
     >
       <i class="fa fa-paper-plane mr-3"></i>
-      Send Message
+      {{ buttonText }}
     </button>
   </div>
 </template>
@@ -22,16 +22,18 @@ import * as PIConstants from "./../../constants/ProvideInjectConstants.js";
 export default {
   setup() {
     const newMessage = ref("");
+    const buttonText = ref("Send");
     const pk = inject(PIConstants.PUBLIC_KEY);
     const computer = inject(PIConstants.COMPUTER);
     const threadId = inject(PIConstants.SELECTED_THREAD_ID_KEY);
     const updateSelectedThread = inject(
       PIConstants.UPDATE_SELECTED_REV_FUNCTION
     );
-    return { computer, newMessage, threadId, pk, updateSelectedThread };
+    return { computer, newMessage, threadId, pk, updateSelectedThread, buttonText };
   },
   methods: {
     async sendMessage(_newMessage) {
+      this.buttonText = "Sending...";
       console.log("Sending Message on Thread ID:", this.threadId);
       let _thread = await this.computer.sync(this.threadId);
       let _date = new Date().toString();
@@ -49,6 +51,8 @@ export default {
         _thread
       );
       this.updateSelectedThread(_thread._rev);
+      this.buttonText = "Send";
+      this.newMessage = "";
     }
   }
 };
