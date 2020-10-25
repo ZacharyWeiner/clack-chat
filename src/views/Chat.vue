@@ -7,10 +7,10 @@
           <Header :title="threadTitle" />
           <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-200">
             <div class=" mx-auto px-6 py-1">
-              <div v-if="loading">
+              <div v-if="loading || !initLoaded">
                 <LoadingPanel />
               </div>
-              <div v-if="!loading">
+              <div v-if="!loading && initLoaded">
                 <div class="pb-5" v-if="thread && thread.title">
                   <div
                     v-if="messages.length > 0"
@@ -162,9 +162,8 @@ import Header from "./../components/Header";
 import Sidebar from "./../components/chat/Sidebar";
 import SendMessage from "./../components/chat/SendMessage";
 import FileUtils from "@/utilities/FileUtils.js";
-
 export default {
-  setup() {
+  async setup() {
     let seed = window.localStorage.getItem(LSConstants.SEED);
     const revList = ref(["Loading..."]);
     const messages = ref([]);
@@ -173,6 +172,7 @@ export default {
     const selectedThread = ref(window.localStorage.getItem("SelectedThread"));
     const threadId = ref("");
     const loading = ref(false);
+    const initLoaded = ref(false);
     const open = ref(false);
     const balance = ref(0);
     const to = ref("");
@@ -185,36 +185,30 @@ export default {
       revList.value = _revList;
       console.log("Set Rev List in updateRevList:", revList.value);
     };
-
     const updateLoading = _bool => {
       loading.value = _bool;
       console.log("Loading:", _bool);
     };
-
     const updateSelectedThread = _id => {
       window.localStorage.setItem("SelectedThread", _id);
       selectedThread.value = _id;
-      thread.value = null;
       console.log("updateSelectedThread() on Chat.vue Triggered:", _id);
     };
-
     const updateThread = _thread => {
       thread.value = _thread;
       console.log("Updated Thread ", _thread);
     };
-
     const updateMessages = arr => {
       messages.value = arr;
       console.log("executing updatingMessages:", arr);
       if (loading.value) loading.value = false;
     };
-
     const showNewChatModal = () => {
       open.value = true;
     };
     const pk = ref(computer.db.wallet.getPublicKey().toString());
-    console.log("User PK:", pk);
 
+    console.log("User PK:", pk);
     provide(PIConstants.COMPUTER, computer);
     provide("revList", revList);
     provide("loading", loading);
@@ -246,18 +240,21 @@ export default {
       to,
       chatTitle,
       pk,
-      showNewChatModal
+      showNewChatModal,
+      initLoaded
     };
   },
-  mounted() {
+  async mounted() {
     //Redirect back to home if no Seed is found
     if (!window.localStorage.getItem(LSConstants.SEED)) {
       this.$router.push("/login");
     }
     //otherwise - mount the component
     console.log("Mouting Chat.vue with thread:", this.selectedThread);
-    this.pollThreads();
-    this.pollMessages();
+    await this.pollThreads();
+    await this.pollLatestRev();
+    await this.pollMessages();
+    this.initLoaded = true;
   },
   components: {
     Messages,
@@ -269,7 +266,8 @@ export default {
   data: function() {
     return {
       polling: null,
-      pollingMessages: null
+      pollingMessages: null,
+      pollingLatestRev: null
     };
   },
   computed: {
@@ -282,7 +280,31 @@ export default {
       return "Select A Chat";
     }
   },
+  beforeUnmount() {
+    clearInterval(this.polling);
+    clearInterval(this.pollingMessages);
+    clearInterval(this.pollingLatestRev);
+  },
   methods: {
+    async pollLatestRev() {
+      this.pollingLatestRev = setInterval(async () => {
+        if (this.thread) {
+          let latestRev = await this.computer.getLatestRev(this.thread._id);
+          console.log("Polling for new rev:", latestRev, this.selectedThread);
+          if (latestRev != this.selectedThread) {
+            console.log(
+              "Latest Rev on the Thread was not equal to selected thread. \n Rev:",
+              latestRev,
+              "Selected Thread:",
+              this.selectedThread
+            );
+            console.log("updateing selected thread to: ", latestRev);
+            this.loading = true;
+            this.selectedThread = latestRev;
+          }
+        }
+      }, 3000);
+    },
     pollThreads() {
       this.polling = setInterval(async () => {
         this.computer.db.wallet
@@ -302,6 +324,7 @@ export default {
     pollMessages() {
       this.pollingMessages = setInterval(async () => {
         if (this.selectedThread) {
+          console.log("Polling Messages");
           this.computer.sync(this.selectedThread).then(r => {
             this.updateThread(r);
             if (r.messages.length > 0) {

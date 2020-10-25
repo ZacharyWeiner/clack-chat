@@ -8,6 +8,7 @@ import Login from "../views/Login.vue";
 import Modal from "../views/Modal.vue";
 import Card from "../views/Card.vue";
 import Chat from "../views/Chat.vue";
+import Profile from "../views/Profile.vue";
 import Blank from "../views/Blank.vue";
 
 const routes = [
@@ -33,6 +34,12 @@ const routes = [
     path: "/chat",
     name: "Chat",
     component: Chat,
+    meta: { layout: "chat" }
+  },
+  {
+    path: "/profile",
+    name: "Profile",
+    component: Profile,
     meta: { layout: "chat" }
   },
   {

@@ -29,7 +29,14 @@ export default {
     const updateSelectedThread = inject(
       PIConstants.UPDATE_SELECTED_REV_FUNCTION
     );
-    return { computer, newMessage, threadId, pk, updateSelectedThread, buttonText };
+    return {
+      computer,
+      newMessage,
+      threadId,
+      pk,
+      updateSelectedThread,
+      buttonText
+    };
   },
   methods: {
     async sendMessage(_newMessage) {
@@ -37,13 +44,9 @@ export default {
       console.log("Sending Message on Thread ID:", this.threadId);
       let _thread = await this.computer.sync(this.threadId);
       let _date = new Date().toString();
-      console.log("NewMessage: ", _newMessage);
-      await _thread.post(
-        this.pk,
-        window.localStorage.getItem(Constants.DISPLAYNAME),
-        _newMessage,
-        _date
-      );
+      let displayName = window.localStorage.getItem(Constants.DISPLAYNAME); 
+      console.log("NewMessage: ",this.pk, displayName, _newMessage, _date);
+      await _thread.post(this.pk, displayName, _newMessage, _date);
       console.log(
         "Sent on Synced from ThreadID",
         this.threadId,
