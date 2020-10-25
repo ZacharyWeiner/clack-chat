@@ -119,7 +119,7 @@
     -->
         <div :class="`${menuState} md:hidden`">
           <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <a
+            <!-- <a
               href="#"
               class="block px-3 py-2 rounded-md text-base font-medium text-white bg-gray-900 focus:outline-none focus:text-white focus:bg-gray-700"
               >Dashboard</a
@@ -141,12 +141,12 @@
               href="#"
               class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700 focus:outline-none focus:text-white focus:bg-gray-700"
               >Calendar</a
-            >
+            > -->
 
             <a
               href="#"
               class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700 focus:outline-none focus:text-white focus:bg-gray-700"
-              >Reports</a
+              >Login</a
             >
           </div>
         </div>
@@ -155,6 +155,7 @@
       <header class="bg-white shadow">
         <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
           <Hero />
+          <div class='py-3'></div>
           <Featured />
           <CTA />
         </div>

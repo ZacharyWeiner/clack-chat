@@ -6,14 +6,14 @@
       <h2
         class="text-3xl leading-9 font-extrabold tracking-tight text-gray-900 sm:text-4xl sm:leading-10"
       >
-        Ready to dive in?
+        Ready to start chatting?
         <br />
-        <span class="text-indigo-600">Start your free trial today.</span>
+        <span class="text-indigo-600">Login or create your seed.</span>
       </h2>
       <div class="mt-8 flex lg:flex-shrink-0 lg:mt-0">
         <div class="inline-flex rounded-md shadow">
           <a
-            href="#"
+            href="/login"
             class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base leading-6 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out"
           >
             Get started
@@ -21,10 +21,11 @@
         </div>
         <div class="ml-3 inline-flex rounded-md shadow">
           <a
-            href="#"
+            target="_blank"
+            href="/login"
             class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base leading-6 font-medium rounded-md text-indigo-600 bg-white hover:text-indigo-500 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out"
           >
-            Learn more
+            I Need A Seed
           </a>
         </div>
       </div>
