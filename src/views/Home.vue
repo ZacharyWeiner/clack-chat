@@ -8,17 +8,18 @@
       <nav class="bg-gray-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="flex items-center justify-between h-16">
-            <div class="flex items-center">
-              <div class="flex-shrink-0">
-                <img
+            <div class="flex-shrink-0">
+              <!-- <img
                   class="h-8 w-8"
                   src="https://tailwindui.com/img/logos/workflow-mark-on-dark.svg"
                   alt="Workflow logo"
-                />
-              </div>
-              <div class="hidden md:block">
-                <div class="ml-10 flex items-baseline space-x-4">
-                  <a
+                /> -->
+              <Logo />
+            </div>
+            <div class="flex w-full justify-end">
+              <div class="hidden md:block justify-end">
+                <div class="ml-10 flex items-baseline items-end space-x-4">
+                  <!-- <a
                     href="#"
                     class="px-3 py-2 rounded-md text-sm font-medium text-white bg-gray-900 focus:outline-none focus:text-white focus:bg-gray-700"
                     >Dashboard</a
@@ -40,12 +41,12 @@
                     href="#"
                     class="px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-700 focus:outline-none focus:text-white focus:bg-gray-700"
                     >Calendar</a
-                  >
+                  > -->
 
                   <a
-                    href="#"
+                    href="/login"
                     class="px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-700 focus:outline-none focus:text-white focus:bg-gray-700"
-                    >Reports</a
+                    >Login</a
                   >
                 </div>
               </div>
@@ -179,6 +180,7 @@ import { ref } from "vue";
 import Hero from "./../components/home/Hero";
 import Featured from "./../components/home/Featured";
 import CTA from "./../components/home/CTA";
+import Logo from "./../components/Logo";
 
 export default {
   setup() {
@@ -189,7 +191,8 @@ export default {
   components: {
     Hero,
     Featured,
-    CTA
+    CTA,
+    Logo
   },
   methods: {
     toggleMenu() {
