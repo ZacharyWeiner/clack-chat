@@ -38,8 +38,8 @@
         </label>
 
         <label class="block mt-3">
-          <span class="text-gray-700 text-sm"
-            >{{ chain }} Seed Phrase (BIP39)</span
+          <span class="text-gray-700 text-sm" style="text-transform: capitalize"
+            >{{ chain }} {{network}} Seed Phrase (BIP39)</span
           >
           <input
             type="text"
