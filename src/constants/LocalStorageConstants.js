@@ -1,6 +1,10 @@
 export const SEED = "SEED";
 export const NETWORK = "NETWORK";
+export const TESTNET = "testnet";
+export const MAINNET = "mainnet";
 export const CHAIN = "CHAIN";
+export const BSV = "BSV";
+export const BCH = "BCH";
 export const DISPLAYNAME = "DISPLAYNAME";
 export const DEFAULT_ADDRESS = "DEFAULT_ADDRESS";
 export const DEFAULT_PATH = "m/44'/0'/0'/0";

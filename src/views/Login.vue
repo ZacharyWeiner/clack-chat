@@ -38,7 +38,9 @@
         </label>
 
         <label class="block mt-3">
-          <span class="text-gray-700 text-sm">BSV Seed Phrase (BIP39)</span>
+          <span class="text-gray-700 text-sm"
+            >{{ chain }} Seed Phrase (BIP39)</span
+          >
           <input
             type="text"
             class="form-input mt-1 block w-full rounded-md focus:border-indigo-600"
@@ -46,7 +48,8 @@
             placeholder="ill wall allow purpose ..."
           />
           <span class="text-gray-700 text-sm"
-            >Your seed is <span class="underline">never</span> sent to any server</span
+            >Your seed is <span class="underline">never</span> sent to any
+            server</span
           >
           <a
             href="http://accounts.protoshi.com"
@@ -65,6 +68,25 @@
           </button>
         </div>
       </form>
+      <div class="mt-6">
+        <button
+          @click.prevent="toggleNetwork"
+          class="py-2 px-4 text-center rounded-md w-full text-white text-sm hover:bg-gray-500"
+          :class="oppositeNetwork"
+          style="text-transform: capitalize"
+        >
+          Switch To {{ oppositeNetwork }}
+        </button>
+      </div>
+      <div class="mt-1">
+        <button
+          @click.prevent="toggleChain"
+          class="py-2 px-4 text-center  rounded-md w-full text-white text-sm hover:bg-gray-500"
+          :class="oppositeChain"
+        >
+          Switch To {{ oppositeChain }}
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -81,6 +103,32 @@ export default defineComponent({
     const displayName = ref("");
     const password = ref("");
     const checked = ref("");
+    const chain = ref(
+      window.localStorage.getItem(Constants.CHAIN) || Constants.BSV
+    );
+    const network = ref(
+      window.localStorage.getItem(Constants.NETWORK) || Constants.TESTNET
+    );
+
+    const toggleChain = () => {
+      if (!chain.value || chain.value === Constants.BCH) {
+        window.localStorage.setItem(Constants.CHAIN, Constants.BSV);
+        chain.value = Constants.BSV;
+      } else {
+        window.localStorage.setItem(Constants.CHAIN, Constants.BCH);
+        chain.value = Constants.BCH;
+      }
+    };
+
+    const toggleNetwork = () => {
+      if (!network.value || network.value === Constants.MAINNET) {
+        window.localStorage.setItem(Constants.NETWORK, Constants.TESTNET);
+        network.value = Constants.TESTNET;
+      } else {
+        window.localStorage.setItem(Constants.NETWORK, Constants.MAINNET);
+        network.value = Constants.MAINNET;
+      }
+    };
 
     const login = async (name, pass) => {
       if (!pass) {
@@ -90,13 +138,15 @@ export default defineComponent({
       try {
         const computer = new Computer({
           chain: "BSV",
-          network: "testnet",
+          network: network,
           seed: pass
         });
         let address = await computer.db.wallet.getAddress();
         console.log("Successfully Logged In", address);
         window.localStorage.setItem(Constants.SEED, pass);
         window.localStorage.setItem(Constants.DISPLAYNAME, name);
+        window.localStorage.setItem(Constants.CHAIN, chain);
+        window.localStorage.setItem(Constants.NETWORK, network);
         router.push("/chat");
       } catch (err) {
         console.log(err);
@@ -118,8 +168,22 @@ export default defineComponent({
       login,
       displayName,
       password,
-      checked
+      checked,
+      chain,
+      network,
+      toggleChain,
+      toggleNetwork
     };
+  },
+  computed: {
+    oppositeChain() {
+      if (this.chain === Constants.BSV) return Constants.BCH;
+      return Constants.BSV;
+    },
+    oppositeNetwork() {
+      if (this.network === Constants.TESTNET) return Constants.MAINNET;
+      return Constants.TESTNET;
+    }
   }
 });
 </script>

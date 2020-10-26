@@ -46,6 +46,8 @@
     </div>
 
     <div class="flex items-center">
+       <div> <span class="rounded px-1 py-1" :class="network"> {{network}} </span> </div>
+      <div> <span class="rounded px-1 py-1 ml-1" :class="chain"> {{chain}} </span> </div>
       <button class="flex mx-4 text-gray-600 focus:outline-none">
         <svg
           class="h-6 w-6"
@@ -113,12 +115,15 @@ export default {
     let _dn = window.localStorage.getItem(Constants.DISPLAYNAME);
     const displayName = ref(_dn);
     console.log("Display Name:", _dn);
-
+    const chain = ref(window.localStorage.getItem(Constants.CHAIN));
+    const network = ref(window.localStorage.getItem(Constants.NETWORK));
     return {
       isOpen,
       dropdownOpen,
       displayName,
-      props
+      props,
+      chain,
+      network
     };
   },
   methods: {

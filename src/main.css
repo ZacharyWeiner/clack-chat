@@ -57,3 +57,20 @@ This can be a useful alternative to @apply when you want to reference a value fr
 .btn-from-theme {
     background-color: theme('colors.blue.500');
   }
+
+.BSV{
+  background-color: theme('colors.orange.500');
+}
+
+.BCH{
+  background-color: theme('colors.green.500');
+}
+
+.mainnet{
+  background-color: theme('colors.red.500');
+}
+
+.testnet{
+  background-color: theme('colors.gray.800');
+  color: theme('colors.gray.100');
+}

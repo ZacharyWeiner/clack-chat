@@ -177,8 +177,9 @@ export default {
     const to = ref("");
     const chatTitle = ref("");
     const computer = new Computer({
-      chain: "BSV",
-      seed: seed
+      chain: window.localStorage.getItem(LSConstants.CHAIN),
+      seed: seed,
+      network: window.localStorage.getItem(LSConstants.NETWORK)
     });
     const updateRevList = _revList => {
       revList.value = _revList;
