@@ -210,7 +210,7 @@ export default {
 
     console.log("User PK:", pk);
     provide(PIConstants.COMPUTER, computer);
-    provide("revList", revList);
+    provide(PIConstants.REV_LIST, revList);
     provide("loading", loading);
     provide(PIConstants.SELECTED_THREAD_ID_KEY, selectedThread);
     provide(PIConstants.PUBLIC_KEY, pk);
@@ -299,7 +299,6 @@ export default {
               this.selectedThread
             );
             console.log("updateing selected thread to: ", latestRev);
-            this.loading = true;
             this.selectedThread = latestRev;
           }
         }
@@ -327,7 +326,10 @@ export default {
           console.log("Polling Messages");
           this.computer.sync(this.selectedThread).then(r => {
             this.updateThread(r);
-            if (r.messages.length > 0) {
+            if (
+              r.messages.length > 0 &&
+              r.messages.length != this.messages.length
+            ) {
               this.updateMessages(r.messages);
               console.log("Messages Loaded:", r.messages);
             }

@@ -66,7 +66,7 @@ import Logo from "./../Logo";
 
 export default {
   async setup() {
-    const revList = inject("revList");
+    const revList = inject(PIConstants.REV_LIST);
     const updateLoading = inject(PIConstants.UPDATE_LOADING_FUNCTION);
     const selectedThread = inject(PIConstants.SELECTED_THREAD_ID_KEY);
     const showNewChatModal = inject(PIConstants.SHOW_NEW_CHAT_MODAL_FUNCTION);
