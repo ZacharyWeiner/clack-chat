@@ -12,6 +12,8 @@
               </div>
               <div v-if="!loading && initLoaded">
                 <div class="pb-5" v-if="thread && thread.title">
+                  <!-- Thread Rev{{ thread._rev }}<br />
+                  Thread ID{{ thread._id }}<br /> -->
                   <div v-if="messages.length > 0" :class="getClass('messages')">
                     <Messages :messages="messages" />
                   </div>
@@ -180,25 +182,32 @@ export default {
     });
     const updateRevList = _revList => {
       revList.value = _revList;
-      console.log("Set Rev List in updateRevList:", revList.value);
+      console.log(
+        "updateRevList() called on Chat.vue with array",
+        revList.value
+      );
     };
     const updateLoading = _bool => {
       loading.value = _bool;
-      console.log("Loading:", _bool);
+      console.log("updateLoading() on Chat.vue called with value:", _bool);
     };
     const updateSelectedThread = _id => {
+      console.log("setting selected Thread Local Storage with id:", _id);
       window.localStorage.setItem("SelectedThread", _id);
       selectedThread.value = _id;
       console.log("updateSelectedThread() on Chat.vue Triggered:", _id);
     };
     const updateThread = _thread => {
       thread.value = _thread;
-      console.log("Updated Thread ", _thread);
+      console.log("updateThread() called on Chat.vue with thread: ", _thread);
     };
     const updateMessages = arr => {
       messages.value = arr;
-      console.log("executing updatingMessages:", arr);
       if (loading.value) loading.value = false;
+      console.log(
+        "updateMessages called on Chat.vue with messages array:",
+        arr
+      );
     };
     const showNewChatModal = () => {
       open.value = true;
@@ -241,16 +250,16 @@ export default {
       initLoaded
     };
   },
-  async mounted() {
+  mounted() {
     //Redirect back to home if no Seed is found
     if (!window.localStorage.getItem(LSConstants.SEED)) {
       this.$router.push("/login");
     }
     //otherwise - mount the component
     console.log("Mouting Chat.vue with thread:", this.selectedThread);
-    await this.pollThreads();
-    await this.pollLatestRev();
-    await this.pollMessages();
+    this.pollThreads();
+    this.pollLatestRev();
+    this.pollMessages();
     this.initLoaded = true;
   },
   components: {
@@ -283,21 +292,25 @@ export default {
     clearInterval(this.pollingLatestRev);
   },
   methods: {
-    async pollLatestRev() {
+    pollLatestRev() {
       this.pollingLatestRev = setInterval(async () => {
+        let latestRev;
         if (this.thread) {
-          let latestRev = await this.computer.getLatestRev(this.thread._id);
-          console.log("Polling for new rev:", latestRev, this.selectedThread);
-          if (latestRev != this.selectedThread) {
-            console.log(
-              "Latest Rev on the Thread was not equal to selected thread. \n Rev:",
-              latestRev,
-              "Selected Thread:",
-              this.selectedThread
-            );
-            console.log("updateing selected thread to: ", latestRev);
-            this.selectedThread = latestRev;
-          }
+          this.computer.getLatestRev(this.thread._id).then(r => {
+            console.log("returning latest rev and assigning:", r);
+            latestRev = r;
+            console.log("Polling for new rev:", latestRev, this.selectedThread);
+            if (latestRev != this.selectedThread) {
+              console.log(
+                "Latest Rev on the Thread was not equal to selected thread. \n Rev:",
+                latestRev,
+                "Selected Thread:",
+                this.selectedThread
+              );
+              console.log("updateing selected thread to: ", latestRev);
+              this.selectedThread = latestRev;
+            }
+          });
         }
       }, 3000);
     },
@@ -347,6 +360,7 @@ export default {
           chatTitle
         ]);
         this.open = false;
+        this.messages = [];
         console.log("Thread Created: ", thread_rev);
       } catch (err) {
         alert(err);

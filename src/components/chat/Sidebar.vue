@@ -98,8 +98,13 @@ export default {
   methods: {
     async updateThread(rev) {
       this.updateLoading(true);
+      console.log(
+        "Setting Rev as Selected Thread in Local Storage from Sidebar :",
+        rev
+      );
+      window.localStorage.setItem("SelectedThread", rev);
+      console.log("Sidebar calling updateSelectedThread with rev:", rev);
       this.updateSelectedThread(rev);
-      console.log("Update From Sidebard Clicked:", rev);
     }
   }
 };
