@@ -211,7 +211,7 @@ export default {
     console.log("User PK:", pk);
     provide(PIConstants.COMPUTER, computer);
     provide(PIConstants.REV_LIST, revList);
-    provide("loading", loading);
+    provide(PIConstants.LOADING_KEY, loading);
     provide(PIConstants.SELECTED_THREAD_ID_KEY, selectedThread);
     provide(PIConstants.PUBLIC_KEY, pk);
     provide(PIConstants.THREAD_KEY, thread);

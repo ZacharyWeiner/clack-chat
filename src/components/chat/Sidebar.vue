@@ -70,7 +70,7 @@ export default {
     const updateLoading = inject(PIConstants.UPDATE_LOADING_FUNCTION);
     const selectedThread = inject(PIConstants.SELECTED_THREAD_ID_KEY);
     const showNewChatModal = inject(PIConstants.SHOW_NEW_CHAT_MODAL_FUNCTION);
-    const loading = inject("loading");
+    const loading = inject(PIConstants.LOADING_KEY);
     const updateSelectedThread = inject(
       PIConstants.UPDATE_SELECTED_REV_FUNCTION
     );
