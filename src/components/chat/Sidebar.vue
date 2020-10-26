@@ -72,7 +72,7 @@ export default {
     const updateSelectedThread = inject(
       PIConstants.UPDATE_SELECTED_REV_FUNCTION
     );
-    console.log("Selected Thread at Sidebar setup():", selectedThread.value);
+    console.log("Selected Thread at Sidebar setup():", selectedThread);
     const { isOpen } = useSidebar();
     const activeClass = ref(
       "bg-gray-600 bg-opacity-25 text-gray-100 border-gray-100"
@@ -98,11 +98,6 @@ export default {
   methods: {
     async updateThread(rev) {
       this.updateLoading(true);
-      console.log(
-        "Setting Rev as Selected Thread in Local Storage from Sidebar :",
-        rev
-      );
-      window.localStorage.setItem("SelectedThread", rev);
       console.log("Sidebar calling updateSelectedThread with rev:", rev);
       this.updateSelectedThread(rev);
     }

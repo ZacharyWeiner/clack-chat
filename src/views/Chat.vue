@@ -12,8 +12,8 @@
               </div>
               <div v-if="!loading && initLoaded">
                 <div class="pb-5" v-if="thread && thread.title">
-                  <!-- Thread Rev{{ thread._rev }}<br />
-                  Thread ID{{ thread._id }}<br /> -->
+                  {{ revs }}
+                  {{ objs }}
                   <div v-if="messages.length > 0" :class="getClass('messages')">
                     <Messages :messages="messages" />
                   </div>
@@ -161,9 +161,23 @@ import Header from "./../components/Header";
 import Sidebar from "./../components/chat/Sidebar";
 import SendMessage from "./../components/chat/SendMessage";
 import FileUtils from "@/utilities/FileUtils.js";
+import getRevs from "@/composables/get-revs.js";
+import syncRevs from "@/composables/sync-revs.js";
+
 export default {
   async setup() {
     let seed = window.localStorage.getItem(LSConstants.SEED);
+    const computer = new Computer({
+      chain: "BSV",
+      seed: seed
+    });
+    const { revs, status_text, initFetch } = getRevs(computer, {
+      fetchImmediately: true
+    });
+    const { objs } = syncRevs(computer, revs, {
+      fetchImmediately: true
+    });
+
     const revList = ref(["Loading..."]);
     const messages = ref([]);
     const thread = ref(null);
@@ -176,10 +190,7 @@ export default {
     const balance = ref(0);
     const to = ref("");
     const chatTitle = ref("");
-    const computer = new Computer({
-      chain: "BSV",
-      seed: seed
-    });
+
     const updateRevList = _revList => {
       revList.value = _revList;
       console.log(
@@ -247,7 +258,11 @@ export default {
       chatTitle,
       pk,
       showNewChatModal,
-      initLoaded
+      initLoaded,
+      revs,
+      status_text,
+      initFetch,
+      objs
     };
   },
   async mounted() {
@@ -257,6 +272,7 @@ export default {
     }
     //otherwise - mount the component
     console.log("Mouting Chat.vue with thread:", this.selectedThread);
+    //this.initFetch();
     await this.pollAll();
     this.initLoaded = true;
   },
@@ -339,13 +355,6 @@ export default {
           console.log("There is no selectedThread in memory.");
         }
         this.loading = false;
-        //then check if we are looking at at thread.
-        // if we are --
-        // call get latestRev on thread._rev
-        //if the latest rev is not equal to the thread rev
-        // sync the thread with the latest rev
-        //update the thread in memory.
-        //update the messages list
       }, 3000);
     },
     async createNewChatThread(chatTitle, to, pk) {
