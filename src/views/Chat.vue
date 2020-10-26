@@ -250,16 +250,14 @@ export default {
       initLoaded
     };
   },
-  mounted() {
+  async mounted() {
     //Redirect back to home if no Seed is found
     if (!window.localStorage.getItem(LSConstants.SEED)) {
       this.$router.push("/login");
     }
     //otherwise - mount the component
     console.log("Mouting Chat.vue with thread:", this.selectedThread);
-    this.pollThreads();
-    this.pollLatestRev();
-    this.pollMessages();
+    await this.pollAll();
     this.initLoaded = true;
   },
   components: {
@@ -271,9 +269,11 @@ export default {
   },
   data: function() {
     return {
+      poll: null,
       polling: null,
       pollingMessages: null,
-      pollingLatestRev: null
+      pollingLatestRev: null,
+      latestRev: 0
     };
   },
   computed: {
@@ -292,62 +292,60 @@ export default {
     clearInterval(this.pollingLatestRev);
   },
   methods: {
-    pollLatestRev() {
-      this.pollingLatestRev = setInterval(async () => {
-        let latestRev;
-        if (this.thread) {
-          this.computer.getLatestRev(this.thread._id).then(r => {
-            console.log("returning latest rev and assigning:", r);
-            latestRev = r;
-            console.log("Polling for new rev:", latestRev, this.selectedThread);
-            if (latestRev != this.selectedThread) {
-              console.log(
-                "Latest Rev on the Thread was not equal to selected thread. \n Rev:",
-                latestRev,
-                "Selected Thread:",
-                this.selectedThread
-              );
-              console.log("updateing selected thread to: ", latestRev);
-              this.selectedThread = latestRev;
-            }
-          });
+    async pollAll() {
+      this.poll = setInterval(async () => {
+        //first get the latest threads, and send them to the sidebar
+        let _revs = await this.computer.getRevs(this.pk);
+        console.log("Revs returned from getRevs in pollAll()", _revs);
+        if (this.revList != _revs) {
+          console.log(
+            "Revs returned is NOT EQUAL to this.revsList Updating Revs list."
+          );
+          this.updateRevList(_revs);
         }
-      }, 3000);
-    },
-    pollThreads() {
-      this.polling = setInterval(async () => {
-        this.computer.db.wallet
-          .getBalance(this.pk)
-          .then(r => (this.balance = r));
-        this.computer.getRevs(this.pk).then(r => {
-          console.log("Logging R:", r, r.length);
-          if (r.length > 0) {
-            this.updateRevList(r);
-          } else {
-            this.updateRevList(["Create A Chat To Start"]);
-          }
-        });
-        console.log("settimeout ended");
-      }, 3000);
-    },
-    pollMessages() {
-      this.pollingMessages = setInterval(async () => {
+        //if not -- do nothing.
+        //
+        //
+        // check for messages to display:
+        // If we have a thread selected by the side bar or updated from syncing the chat
+        let initSync;
         if (this.selectedThread) {
-          console.log("Polling Messages");
-          this.computer.sync(this.selectedThread).then(r => {
-            this.updateThread(r);
-            if (
-              r.messages.length > 0 &&
-              r.messages.length != this.messages.length
-            ) {
-              this.updateMessages(r.messages);
-              console.log("Messages Loaded:", r.messages);
+          console.log("Polling has a selected thread:", this.selectedThread);
+          try {
+            initSync = await this.computer.sync(this.selectedThread);
+            console.log("ObjectID from syncing rev:", initSync._id);
+            this.latestRev = await this.computer.getLatestRev(initSync._id);
+            console.log(
+              "The latestRev from selected thread: \n",
+              this.selectedThread,
+              "is: \n" + this.latestRev
+            );
+          } catch (err) {
+            console.log("There was an error fetching the latest rev: \n", err);
+          }
+          console.log("Messages in memory:", this.messages);
+          //If there are no messages or there is a new message, the latest rev will not match the one we have in memory.
+          if (
+            this.latestRev !== this.selectedThread ||
+            this.messages != initSync.messages
+          ) {
+            this.thread = await this.computer.sync(this.latestRev);
+            console.log("Assigned updated thread after sync");
+            if (this.thread.messages !== this.messages) {
+              this.messages = this.thread.messages;
             }
-          });
+          }
+        } else {
+          console.log("There is no selectedThread in memory.");
         }
-        if (this.loading === true) {
-          this.loading = false;
-        }
+        this.loading = false;
+        //then check if we are looking at at thread.
+        // if we are --
+        // call get latestRev on thread._rev
+        //if the latest rev is not equal to the thread rev
+        // sync the thread with the latest rev
+        //update the thread in memory.
+        //update the messages list
       }, 3000);
     },
     async createNewChatThread(chatTitle, to, pk) {
