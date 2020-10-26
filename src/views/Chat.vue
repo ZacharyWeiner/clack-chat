@@ -1,21 +1,18 @@
 <template>
   <Suspense>
     <template #default>
-      <div class="flex h-screen bg-gray-200 font-roboto">
+      <div :class="getClass('preSidebar')">
         <Sidebar />
-        <div class="flex-1 flex flex-col overflow-hidden">
+        <div :class="getClass('preHeader')">
           <Header :title="threadTitle" />
-          <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-200">
-            <div class=" mx-auto px-6 py-1">
+          <main :class="getClass('main')">
+            <div :class="getClass('content')">
               <div v-if="loading || !initLoaded">
                 <LoadingPanel />
               </div>
               <div v-if="!loading && initLoaded">
                 <div class="pb-5" v-if="thread && thread.title">
-                  <div
-                    v-if="messages.length > 0"
-                    class="pt-5 pb-3 pl-3 pr-3 bg-white rounded"
-                  >
+                  <div v-if="messages.length > 0" :class="getClass('messages')">
                     <Messages :messages="messages" />
                   </div>
                   <SendMessage />
@@ -210,7 +207,7 @@ export default {
 
     console.log("User PK:", pk);
     provide(PIConstants.COMPUTER, computer);
-    provide(PIConstants.REV_LIST, revList);
+    provide(PIConstants.REV_LIST_KEY, revList);
     provide(PIConstants.LOADING_KEY, loading);
     provide(PIConstants.SELECTED_THREAD_ID_KEY, selectedThread);
     provide(PIConstants.PUBLIC_KEY, pk);
@@ -355,6 +352,29 @@ export default {
         alert(err);
         this.open = false;
       }
+    },
+    getClass(placement) {
+      let returnClass = "";
+      switch (placement) {
+        case "preSidebar":
+          returnClass = "flex h-screen bg-gray-200 font-roboto";
+          break;
+        case "preHeader":
+          returnClass = "flex-1 flex flex-col overflow-hidden";
+          break;
+        case "main":
+          returnClass = "flex-1 overflow-x-hidden overflow-y-auto bg-gray-200";
+          break;
+        case "messages":
+          returnClass = "pt-5 pb-3 pl-3 pr-3 bg-white rounded";
+          break;
+        case "content":
+          returnClass = "mx-auto px-6 py-1";
+          break;
+        default:
+          returnClass = "";
+      }
+      return returnClass;
     }
   }
 };
