@@ -1,7 +1,7 @@
 export const SEED = "SEED";
 export const NETWORK = "NETWORK";
 export const TESTNET = "testnet";
-export const MAINNET = "mainnet";
+export const MAINNET = "livenet";
 export const CHAIN = "CHAIN";
 export const BSV = "BSV";
 export const BCH = "BCH";

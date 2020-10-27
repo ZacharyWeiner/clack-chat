@@ -66,11 +66,11 @@ This can be a useful alternative to @apply when you want to reference a value fr
   background-color: theme('colors.green.500');
 }
 
-.mainnet{
+.livenet{
   background-color: theme('colors.red.500');
 }
 
 .testnet{
-  background-color: theme('colors.gray.800');
+  background-color: theme('colors.gray.500');
   color: theme('colors.gray.100');
 }

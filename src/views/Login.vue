@@ -26,11 +26,11 @@
         >
       </div>
 
-      <form class="mt-4" @submit.prevent="login(displayName, password)">
+      <form class="mt-4" @submit.prevent="login(displayName, password, chain, network)">
         <label class="block">
           <span class="text-gray-700 text-sm">Display Name</span>
           <input
-            type="email"
+            type="text"
             class="form-input mt-1 block w-full rounded-md focus:border-indigo-600"
             v-model="displayName"
             placeholder="What Should We Call You?"
@@ -39,7 +39,7 @@
 
         <label class="block mt-3">
           <span class="text-gray-700 text-sm" style="text-transform: capitalize"
-            >{{ chain }} {{network}} Seed Phrase (BIP39)</span
+            >{{ chain }} {{ network }} Seed Phrase (BIP39)</span
           >
           <input
             type="text"
@@ -61,7 +61,6 @@
         </label>
         <div class="mt-6">
           <button
-            @click.prevent="login(displayName, password)"
             class="py-2 px-4 text-center bg-indigo-600 rounded-md w-full text-white text-sm hover:bg-indigo-500"
           >
             Sign in
@@ -103,12 +102,17 @@ export default defineComponent({
     const displayName = ref("");
     const password = ref("");
     const checked = ref("");
-    const chain = ref(
-      window.localStorage.getItem(Constants.CHAIN) || Constants.BSV
-    );
-    const network = ref(
-      window.localStorage.getItem(Constants.NETWORK) || Constants.TESTNET
-    );
+    let _chain = window.localStorage.getItem(Constants.CHAIN);
+    let _net = window.localStorage.getItem(Constants.NETWORK);
+    if (!_chain || _chain === "") {
+      _chain = Constants.BSV;
+    }
+    if (!_net || _net === "") {
+      _net = Constants.TESTNET;
+    }
+    console.log(_chain, _net);
+    const chain = ref(_chain);
+    const network = ref(_net);
 
     const toggleChain = () => {
       if (!chain.value || chain.value === Constants.BCH) {
@@ -130,15 +134,15 @@ export default defineComponent({
       }
     };
 
-    const login = async (name, pass) => {
+    const login = async (name, pass, chain, net) => {
       if (!pass) {
         alert("Seed is required");
         return;
       }
       try {
         const computer = new Computer({
-          chain: "BSV",
-          network: network,
+          chain: chain,
+          network: net,
           seed: pass
         });
         let address = await computer.db.wallet.getAddress();
@@ -146,7 +150,7 @@ export default defineComponent({
         window.localStorage.setItem(Constants.SEED, pass);
         window.localStorage.setItem(Constants.DISPLAYNAME, name);
         window.localStorage.setItem(Constants.CHAIN, chain);
-        window.localStorage.setItem(Constants.NETWORK, network);
+        window.localStorage.setItem(Constants.NETWORK, net);
         router.push("/chat");
       } catch (err) {
         console.log(err);

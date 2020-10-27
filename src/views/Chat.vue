@@ -176,10 +176,13 @@ export default {
     const balance = ref(0);
     const to = ref("");
     const chatTitle = ref("");
+    let _chain = window.localStorage.getItem(LSConstants.CHAIN);
+    let _net = window.localStorage.getItem(LSConstants.NETWORK);
+    console.log(_chain, _net);
     const computer = new Computer({
-      chain: window.localStorage.getItem(LSConstants.CHAIN),
+      chain: _chain,
       seed: seed,
-      network: window.localStorage.getItem(LSConstants.NETWORK)
+      network: _net
     });
     const updateRevList = _revList => {
       revList.value = _revList;
