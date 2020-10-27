@@ -24,7 +24,7 @@
       </button>
 
       <div class="relative mx-4 lg:mx-0">
-        <div class='text-3xl'> {{props.title}} </div>
+        <div class="text-3xl">{{ props.title }}</div>
         <!-- <span class="absolute inset-y-0 left-0 pl-3 flex items-center">
           <svg class="h-5 w-5 text-gray-500" viewBox="0 0 24 24" fill="none">
             <path
@@ -46,8 +46,12 @@
     </div>
 
     <div class="flex items-center">
-       <div> <span class="rounded px-1 py-1" :class="network"> {{network}} </span> </div>
-      <div> <span class="rounded px-1 py-1 ml-1" :class="chain"> {{chain}} </span> </div>
+      <div>
+        <span class="rounded px-1 py-1" :class="network"> {{ network }} </span>
+      </div>
+      <div>
+        <span class="rounded px-1 py-1 ml-1" :class="chain"> {{ chain }} </span>
+      </div>
       <button class="flex mx-4 text-gray-600 focus:outline-none">
         <svg
           class="h-6 w-6"
@@ -64,7 +68,7 @@
           />
         </svg>
       </button>
-      <div  @click="dropdownOpen = !dropdownOpen">{{ displayName }}</div>
+      <div @click="dropdownOpen = !dropdownOpen">{{ displayName }}</div>
       <div class="relative">
         <!-- <button
           @click="dropdownOpen = !dropdownOpen"
@@ -87,10 +91,11 @@
           class="absolute right-0 mt-2 py-2 w-48 bg-white rounded-md shadow-xl z-20"
         >
           <a
-            href="/profile"
+           href="/profile"
             class="w-full block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-600 hover:text-white"
-            >Profile</a
           >
+            Profile
+          </a>
           <button
             @click="logout"
             class="w-full block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-600 hover:text-white"
@@ -137,6 +142,6 @@ export default {
       this.$router.push("/");
     }
   },
-  props:['title']
+  props: ["title"]
 };
 </script>
