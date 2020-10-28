@@ -5,7 +5,7 @@
     </div>
     <div
       class="overflow-y-auto"
-      style="max-height: 800px; overflow: -moz-scrollbars-vertical;"
+      style="max-height: 700px; overflow: -moz-scrollbars-vertical;"
     >
       <div v-for="profile in profiles" :key="profile._rev">
         <div class=" rounded bg-white overflow-hidden shadow-lg mt-6">
