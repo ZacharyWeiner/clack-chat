@@ -24,6 +24,23 @@
     .btn-primary:hover{
         @apply bg-indigo-500 text-white;
     }
+
+    h1{
+      @apply text-4xl;
+    }
+    h2{
+      @apply text-3xl;
+    }
+    h3{
+      @apply text-2xl;
+    }
+    h4{
+      @apply text-xl;
+    }
+
+    a{
+      @apply text-indigo-500 underline;
+    }
 }
 
 /* Use the @layer directive to tell Tailwind which "bucket" 
@@ -73,4 +90,9 @@ This can be a useful alternative to @apply when you want to reference a value fr
 .testnet{
   background-color: theme('colors.gray.500');
   color: theme('colors.gray.100');
+}
+
+.hljs{
+  background-color: theme('colors.black');
+  color: theme('colors.white');
 }
