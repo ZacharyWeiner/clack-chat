@@ -37,7 +37,7 @@
 
           <span class="mx-4 text-lg "> My Threads</span>
         </button>
-        <div class="overflow-y-auto h-132 bg-gray-800 rounded mx-4">
+        <div class="overflow-y-auto bg-gray-800 rounded mx-4" style="max-height: 300px; overflow: -moz-scrollbars-vertical;">
           <div v-for="rev in revList" :key="rev">
             <button
               class="flex w-full items-center mt-4 mb-4"

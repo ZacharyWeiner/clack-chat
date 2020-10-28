@@ -47,7 +47,7 @@ const routes = [
     path: "/profile",
     name: "Profile",
     component: Profile,
-    meta: { layout: "chat" }
+    meta: { layout: "empty" }
   },
   {
     path: "/dashboard",

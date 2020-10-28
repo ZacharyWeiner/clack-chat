@@ -3,10 +3,10 @@ export default class UserProfile {
     pubKey,
     oc,
     displayName,
-    url,
+    website,
     bio,
     image,
-    position,
+    jobTitle,
     company,
     companyUrl
   ) {
@@ -15,21 +15,22 @@ export default class UserProfile {
     this.contractTypeVersion = "0.0.1";
     this.originalChannel = oc;
     this._owners = [pubKey];
+    this.manager = pubKey;
     this.displayName = displayName;
-    this.url = url;
+    this.website = website;
     this.bio = bio;
     this.image = image;
-    this.position = position;
+    this.jobTitle = jobTitle;
     this.company = company;
-    this.companUrl = companyUrl;
+    this.companyUrl = companyUrl;
   }
 
   setDisplayName(name) {
     this.displayName = name;
   }
 
-  setUrl(url) {
-    this.url = url;
+  setWebsite(website) {
+    this.website = website;
   }
 
   setBio(bioAsMarkdown) {
@@ -40,8 +41,8 @@ export default class UserProfile {
     this.image = imageUrl;
   }
 
-  setPosition(position) {
-    this.position = position;
+  setJobTitle(jobTitle) {
+    this.jobTitle = jobTitle;
   }
 
   setCompany(companyName) {
@@ -50,5 +51,22 @@ export default class UserProfile {
 
   setCompanyUrl(companyUrl) {
     this.companyUrl = companyUrl;
+  }
+
+  shareWith(pubKey) {
+    //how do I get the public key of the user making the request?
+    //if the user is not the manager, I do not want to allow the user to make a change here
+    //even if they are the owner.
+    this._owners.push(pubKey);
+  }
+
+  removeShare(pubKey) {
+    let _temp = this._owners;
+    let index = _temp.indexOf(pubKey);
+    if (index === -1) {
+      throw new Error("The key does not exist in the shared list");
+    }
+    _temp.splice(index, 1);
+    this._owners = _temp;
   }
 }
