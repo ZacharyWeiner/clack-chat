@@ -5,25 +5,42 @@
       class="w-10 h-10 rounded mr-3"
     />
     <div class="flex-1 overflow-hidden">
-      <div class=''>
-        <span class="font-bold text-xs underline">{{ m.split(":")[1] }}</span>
+      <div class="">
+        <span class="font-bold text-xs underline">{{ displayName }}</span>
         <span class="pl-3"></span>
-        <span class="text-grey text-xs"
-          >{{ m.split(":")[3] }}:{{ m.split(":")[4] }} </span
-        >
+        <span class="text-grey text-xs"> </span>
       </div>
-      <p class="text-black leading-normal">
-        {{ m.split(":")[2] }}
-      </p>
+      <br />
+      <div class='message'>
+        <vue3-markdown-it :source="body" />
+      </div>
     </div>
   </div>
 </template>
 <script>
+import {ref} from "vue";
 export default {
   setup(props) {
     const m = new String(props.message);
-    return { m };
+    let json = {};
+    try {
+      json = JSON.parse(m);
+      console.log(json);
+    } catch (err) {
+      console.log(err);
+    }
+
+    const displayName = ref(json.displayName);
+    const body = ref(json.message);
+    const date = ref(json.date);
+  
+    return { displayName, body, date };
   },
   props: ["message"]
 };
 </script>
+<style scoped>
+.message > div>  h2 > a  {
+  color:blueviolet;
+}
+</style>

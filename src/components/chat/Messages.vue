@@ -23,8 +23,8 @@ export default {
   computed: {},
   methods: {
     getKeyFromMessage(m) {
-      let split = m.split(":");
-      return `${split[3]}${split[4]}${split[5]}${split[6]}` || m;
+      let split = m[1];
+      return split || m;
     }
   }
 };

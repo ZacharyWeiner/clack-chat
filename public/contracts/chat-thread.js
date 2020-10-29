@@ -12,10 +12,10 @@ export default class Chat {
     this.archived = false;
   }
 
-  post(pubKey, displayName, message, date) {
+  post(messageAsJson) {
     if (this.archived === true)
       return new Error("This Thread is already archived.");
-    this.messages.push(`${pubKey}:${displayName}:${message}:${date}`);
+    this.messages.push(messageAsJson);
   }
 
   invite(publicKey) {

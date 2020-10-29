@@ -44,9 +44,15 @@ export default {
       console.log("Sending Message on Thread ID:", this.threadId);
       let _thread = await this.computer.sync(this.threadId);
       let _date = new Date().toString();
-      let displayName = window.localStorage.getItem(Constants.DISPLAYNAME); 
-      console.log("NewMessage: ",this.pk, displayName, _newMessage, _date);
-      await _thread.post(this.pk, displayName, _newMessage, _date);
+      let displayName = window.localStorage.getItem(Constants.DISPLAYNAME);
+      console.log("NewMessage: ", this.pk, displayName, _newMessage, _date);
+      let asJson = {
+        pubKey: this.pk,
+        displayName: displayName,
+        message: _newMessage,
+        date: _date
+      };
+      await _thread.post(JSON.stringify(asJson));
       console.log(
         "Sent on Synced from ThreadID",
         this.threadId,
