@@ -24,11 +24,15 @@
           <div id="profile" :class="getClasses('profile')">
             <div :class="getClasses('profileInner')">
               <!-- Image for mobile view-->
-              <div
-                :class="getClasses('mobileImage')"
-                :style="{ backgroundImage: `url('${profile.image}')` }"
-              ></div>
-
+              <div v-if="profile">
+                <div
+                  :class="getClasses('mobileImage')"
+                  :style="{ backgroundImage: `url('${profile.image}')` }"
+                ></div>
+              </div>
+              <div v-else>
+                <div :class="getClasses('mobileImage')"></div>
+              </div>
               <h1 :class="getClasses('displayName')">{{ displayName }}</h1>
               <i class="fab fa-bitcoin fa-1x" :class="getCoinClass()"
                 >: <span class="align-middle"> {{ balance }}</span
@@ -51,43 +55,46 @@
               <p class="break-all">
                 {{ publicKey }}
               </p>
-              <p
-                class="pt-2 pl-2 text-sm overflow-y-auto bg-gray-200 rounded shadow-xl mt-2"
-                style="min-height:300px; max-height:300px;"
-              >
-                <vue3-markdown-it :source="profile.bio" />
-              </p>
-              <br/>
-              <!-- Begin Tags List --> 
+              <div>
+                <p
+                  class="pt-2 pl-2 text-sm overflow-y-auto bg-gray-200 rounded shadow-xl mt-2"
+                  style="min-height:300px; max-height:300px;"
+                >
+                  <vue3-markdown-it :source="bioOrEmpty" />
+                </p>
+              </div>
+              <br />
+              <!-- Begin Tags List -->
               <div
-                    class="inline-flex max-w-md w-full bg-white shadow-md rounded-lg overflow-hidden ml-3"
+                class="inline-flex max-w-md w-full bg-white shadow-md rounded-lg overflow-hidden ml-3"
+              >
+                <div class="flex justify-center items-center w-12 bg-green-500">
+                  <svg
+                    class="h-6 w-6 fill-current text-white"
+                    viewBox="0 0 40 40"
+                    xmlns="http://www.w3.org/2000/svg"
                   >
-                    <div
-                      class="flex justify-center items-center w-12 bg-green-500"
-                    >
-                      <svg
-                        class="h-6 w-6 fill-current text-white"
-                        viewBox="0 0 40 40"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M20 3.33331C10.8 3.33331 3.33337 10.8 3.33337 20C3.33337 29.2 10.8 36.6666 20 36.6666C29.2 36.6666 36.6667 29.2 36.6667 20C36.6667 10.8 29.2 3.33331 20 3.33331ZM16.6667 28.3333L8.33337 20L10.6834 17.65L16.6667 23.6166L29.3167 10.9666L31.6667 13.3333L16.6667 28.3333Z"
-                        />
-                      </svg>
-                    </div>
+                    <path
+                      d="M20 3.33331C10.8 3.33331 3.33337 10.8 3.33337 20C3.33337 29.2 10.8 36.6666 20 36.6666C29.2 36.6666 36.6667 29.2 36.6667 20C36.6667 10.8 29.2 3.33331 20 3.33331ZM16.6667 28.3333L8.33337 20L10.6834 17.65L16.6667 23.6166L29.3167 10.9666L31.6667 13.3333L16.6667 28.3333Z"
+                    />
+                  </svg>
+                </div>
 
-                    <div class="-mx-31 py-2 px-1">
-                      <div class="mx-3">
-                        <span class="text-green-500 font-semibold"
-                          ><i class="fas fa-address-card pr-2"></i>{{profile.jobTitle}}</span
-                        >
-                        <p class="text-gray-600 text-sm">
-                          <i class="fas fa-building pr-2"></i>{{profile.company}}
-                        </p>
-                      </div>
-                    </div>
+                <div class="-mx-31 py-2 px-1">
+                  <div class="mx-3">
+                    <span class="text-green-500 font-semibold"
+                      ><i class="fas fa-address-card pr-2"></i
+                      >
+                      {{ profile && profile.jobTitle ? profile.jobTitle : ""}}
+                      </span
+                    >
+                    <p class="text-gray-600 text-sm">
+                      <i class="fas fa-building pr-2"></i>{{profile &&  profile.company? profile.company : "" }}
+                    </p>
                   </div>
-              <!-- End Tags List --> 
+                </div>
+              </div>
+              <!-- End Tags List -->
               <Links />
               <div class="pt-12">
                 <div>
@@ -123,7 +130,7 @@
           <div class="w-full lg:w-2/5">
             <!-- Big profile image for side bar (desktop) -->
             <img
-              :src="profile.image"
+              :src="imageOrEmpty"
               class="rounded-none lg:rounded-lg shadow-2xl hidden lg:block"
             />
           </div>
@@ -197,6 +204,16 @@ export default {
   },
   async mounted() {
     this.fetchProfile();
+  },
+  computed: {
+    bioOrEmpty() {
+      if (!this.profile || this.profile.bio === null) return "### We Couldnt Find Your Profile \n --- \n **Click The 'Create Profile' button below to create one** \n\n :sparkles: the cool part is you can use markdown in your profile to make it pop \n \n :astonished: :O :)";
+      else return this.profile.bio;
+    },
+    imageOrEmpty(){
+      if (!this.profile || this.profile.image === null) return "";
+      else return this.profile.image;
+    }
   },
   methods: {
     showForm() {
