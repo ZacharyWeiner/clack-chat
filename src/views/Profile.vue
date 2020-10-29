@@ -19,7 +19,7 @@
           </div>
         </div>
 
-        <div v-else :class="getClasses('profileWrapper')">
+        <div v-else :class="getClasses('profileWrapper')" class="overflow-y-auto">
           <!--Main Col-->
           <div id="profile" :class="getClasses('profile')">
             <div :class="getClasses('profileInner')">
@@ -85,11 +85,11 @@
                     <span class="text-green-500 font-semibold"
                       ><i class="fas fa-address-card pr-2"></i
                       >
-                      {{ profile && profile.jobTitle ? profile.jobTitle : ""}}
+                      {{ profile && profile.jobTitle ? profile.jobTitle : "Wizard of Wonderful"}}
                       </span
                     >
                     <p class="text-gray-600 text-sm">
-                      <i class="fas fa-building pr-2"></i>{{profile &&  profile.company? profile.company : "" }}
+                      <i class="fas fa-building pr-2"></i>{{profile &&  profile.company? profile.company : "Super Awesome co." }}
                     </p>
                   </div>
                 </div>
@@ -134,7 +134,7 @@
               class="rounded-none lg:rounded-lg shadow-2xl hidden lg:block"
             />
           </div>
-
+            
           <!-- Pin to top right corner -->
           <!-- <div class="absolute top-0 right-0 h-12 w-18 p-4">
           <button class="js-change-theme focus:outline-none">🌙</button>
@@ -160,7 +160,7 @@ export default {
     const showEdit = ref(false);
     const showSelect = ref(false);
     const publicKey = ref("");
-    const profile = ref({ bio: "empty", image: "" });
+    const profile = ref({ bio: "empty", image: "https://www.winhelponline.com/blog/wp-content/uploads/2017/12/user.png" });
 
     let computer = new Computer({
       chain: window.localStorage.getItem(LSConstants.CHAIN),
@@ -207,11 +207,11 @@ export default {
   },
   computed: {
     bioOrEmpty() {
-      if (!this.profile || this.profile.bio === null) return "### We Couldnt Find Your Profile \n --- \n **Click The 'Create Profile' button below to create one** \n\n :sparkles: the cool part is you can use markdown in your profile to make it pop \n \n :astonished: :O :)";
+      if (!this.profile || this.profile.bio === null) return "### We Couldnt Find Your Profile \n --- \n **Click The 'Create Profile' button below to create one \n\n :sparkles: the cool part is you can use markdown in your profile to make it pop \n \n :astonished: :O :)";
       else return this.profile.bio;
     },
     imageOrEmpty(){
-      if (!this.profile || this.profile.image === null) return "";
+      if (!this.profile || this.profile.image === null) return "https://www.winhelponline.com/blog/wp-content/uploads/2017/12/user.png";
       else return this.profile.image;
     }
   },

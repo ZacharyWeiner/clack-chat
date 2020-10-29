@@ -32,6 +32,24 @@
                 </div>
               </div>
             </div>
+            <footer class=" text-center">
+          <div class="w-full  p-4">
+            <h1 class="font-bold text-xs text-primary-600">
+              Open Source Code On
+              <a
+                href="https://github.com/ZacharyWeiner/clack-chat"
+                target="_blank"
+                ><i class="fab fa-github-alt text-md"></i
+              ></a>
+            </h1>
+            <span class="text-xs text-primary-600 text-center">
+              Made with ❤️ by
+              <a class="underline" href="https://twitter.com/u/developingzack">
+                @DevelopingZack
+              </a>
+            </span>
+          </div>
+        </footer>
           </main>
           <div
             :class="
