@@ -6,13 +6,21 @@
           Searching ...
         </div>
         <div class="mt-4">
-          <div class="p-6 bg-white rounded-md shadow-md">
-            <h2 class="text-lg text-gray-700 font-semibold capitalize">
-              {{displayName ? displayName : "Save a display name" }}
+          <div class="p-6 bg-white rounded-md shadow-md ">
+            <div
+              class="rounded-full shadow-xl mx-auto -mt-16 h-48 w-48 bg-cover bg-center"
+              :style="getImageUrlStyle"
+            ></div>
+            <div class='mx-auto w-full'>
+            <h2 class="text-2xl text-gray-700 font-semibold capitalize text-center">
+              {{ displayName ? displayName : "Save a display name" }}
             </h2>
-            <div class='rounded-full shadow-xl mx-auto -mt-16 h-48 w-48 bg-cover bg-center' :style="getImageUrlStyle">
             </div>
-            <div style="w-3/4 text-xs break-all">{{ publicKey }}</div>
+            <div style="w-3/4 text-xs">
+              <p class="break-all">
+                {{ publicKey }}
+              </p>
+            </div>
 
             <form @submit.prevent="createProfile">
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
@@ -100,6 +108,12 @@
                 </button>
               </div>
             </form>
+            <button
+              @click.prevent="toggleShowEdit"
+              class="px-4 py-2 bg-gray-800 text-gray-200 rounded-md hover:bg-gray-700 focus:outline-none focus:bg-gray-700"
+            >
+              <i class="fas fa-arrow-left"></i>Back
+            </button>
           </div>
         </div>
       </div>
@@ -128,6 +142,7 @@ export default {
     const profile = ref("");
     const revs = ref([]);
     const _publicKey = inject(PIConstants.PUBLIC_KEY);
+    const toggleShowEdit = inject(PIConstants.PROFILE_SHOW_EDIT_FUNCTION);
     console.log("Testing Key:", _publicKey.value);
     const publicKey = _publicKey;
     //const computer = inject(PIConstants.COMPUTER);
@@ -151,7 +166,8 @@ export default {
       profile,
       computer,
       revs,
-      searching
+      searching,
+      toggleShowEdit
     };
   },
   data: function() {
@@ -190,12 +206,16 @@ export default {
     };
     this.fetchProfile();
   },
-  computed:{
+  computed: {
     getImageUrlStyle() {
-      if(this.imageUrl === null || this.imageUrl === "" || !this.imageUrl.includes("http")){
+      if (
+        this.imageUrl === null ||
+        this.imageUrl === "" ||
+        !this.imageUrl.includes("http")
+      ) {
         return "background-image: url('https://source.unsplash.com/MP0IUfwrn0A')";
       }
-      return `background-image: url('${this.image}')`;
+      return `background-image: url('${this.imageUrl}')`;
     }
   },
   methods: {

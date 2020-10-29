@@ -2,17 +2,20 @@
   <Suspense>
     <template #default>
       <div
-        class="font-sans antialiased text-gray-900 leading-normal tracking-wider bg-cover h-full"
-        style="background-image:url('https://source.unsplash.com/1L71sPT5XKc');"
+        class="font-sans antialiased text-gray-900 bg-gray-300 leading-normal tracking-wider bg-cover h-full"
       >
         <div v-if="showEdit" :class="getClasses('profileWrapper')">
           <div id="profile" :class="getClasses('profile')">
-            <CreateProfile />
+            <div :class="getClasses('profileInner')">
+              <CreateProfile />
+            </div>
           </div>
         </div>
         <div v-else-if="showSelect" :class="getClasses('profileWrapper')">
           <div id="profile" :class="getClasses('profile')">
-            <List />
+            <div :class="getClasses('profileInner')">
+              <List />
+            </div>
           </div>
         </div>
 
@@ -23,24 +26,24 @@
               <!-- Image for mobile view-->
               <div
                 :class="getClasses('mobileImage')"
-                style="background-image: url('https://source.unsplash.com/MP0IUfwrn0A')"
+                :style="{ backgroundImage: `url('${profile.image}')` }"
               ></div>
 
               <h1 :class="getClasses('displayName')">{{ displayName }}</h1>
-              <i class="fab fa-bitcoin fa-2x" :class="getCoinClass()"
-                >: <span class="align-middle"> {{ balance }}</span></i
+              <i class="fab fa-bitcoin fa-1x" :class="getCoinClass()"
+                >: <span class="align-middle"> {{ balance }}</span
+                ><span class="text-lg pl-2 mt-2 text-gray-700"
+                  >satoshis</span
+                ></i
               >
-              <span class="text-xl pl-2">satoshis</span>
 
-              <div :class="getClasses('nameUndeline')"></div>
+              <div :class="getClasses('nameUnderline')"></div>
               <p :class="getClasses('detailsContainer')">
                 <i class="fas fa-map-pin p-2"></i>
-                <span class="font-bold"> Address:</span>
+                <span class="font-bold"> Address:</span>{{ address }}
               </p>
-              {{ address }}
-              <br />
               <p
-                class="pt-4 text-base f flex items-center justify-center lg:justify-start "
+                class="pt-1 text-base f flex items-center justify-center lg:justify-start "
               >
                 <i class="fas fa-key p-2"></i>
                 <span class="font-bold">Public Key: </span><br />
@@ -48,35 +51,69 @@
               <p class="break-all">
                 {{ publicKey }}
               </p>
-              <p class="pt-8 text-sm">
-                Totally optional short description about yourself, what you do
-                and so on.
+              <p
+                class="pt-2 pl-2 text-sm overflow-y-auto bg-gray-200 rounded shadow-xl mt-2"
+                style="min-height:300px; max-height:300px;"
+              >
+                <vue3-markdown-it :source="profile.bio" />
               </p>
+              <br/>
+              <!-- Begin Tags List --> 
+              <div
+                    class="inline-flex max-w-md w-full bg-white shadow-md rounded-lg overflow-hidden ml-3"
+                  >
+                    <div
+                      class="flex justify-center items-center w-12 bg-green-500"
+                    >
+                      <svg
+                        class="h-6 w-6 fill-current text-white"
+                        viewBox="0 0 40 40"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M20 3.33331C10.8 3.33331 3.33337 10.8 3.33337 20C3.33337 29.2 10.8 36.6666 20 36.6666C29.2 36.6666 36.6667 29.2 36.6667 20C36.6667 10.8 29.2 3.33331 20 3.33331ZM16.6667 28.3333L8.33337 20L10.6834 17.65L16.6667 23.6166L29.3167 10.9666L31.6667 13.3333L16.6667 28.3333Z"
+                        />
+                      </svg>
+                    </div>
 
-              <div class="pt-12 pb-8">
+                    <div class="-mx-31 py-2 px-1">
+                      <div class="mx-3">
+                        <span class="text-green-500 font-semibold"
+                          ><i class="fas fa-address-card pr-2"></i>{{profile.jobTitle}}</span
+                        >
+                        <p class="text-gray-600 text-sm">
+                          <i class="fas fa-building pr-2"></i>{{profile.company}}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+              <!-- End Tags List --> 
+              <Links />
+              <div class="pt-12">
+                <div>
+                  <button
+                    @click.prevent="showForm"
+                    class="w-1/2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
+                  >
+                    <i class="fas fa-user-plus"></i> Create Profile
+                  </button>
+                  <button
+                    @click.prevent="showList"
+                    class=" w-1/2 bg-gray-700 hover:bg-gray-900 text-white font-bold py-2 px-4 rounded-full"
+                  >
+                    <i class="far fa-check-circle"></i> Select Profile
+                  </button>
+                </div>
+                <div></div>
+              </div>
+              <div class="pt-12 pb-2">
                 <a
                   href="/chat"
-                  class="bg-teal-700 hover:bg-teal-900 text-white font-bold py-2 px-4 rounded-full"
+                  class="bg-gray-700 hover:bg-gray-900 text-white font-bold py-4 no-underline px-4 rounded-full"
                 >
-                  Back To Chat
+                  <i class="fas fa-arrow-left"></i> Back To Chat
                 </a>
               </div>
-              <div class="pt-12 pb-8">
-                <button
-                  @click.prevent="showForm"
-                  class="bg-teal-700 hover:bg-teal-900 text-white font-bold py-2 px-4 rounded-full"
-                >
-                  Create Profile
-                </button>
-                <button
-                  @click.prevent="showList"
-                  class="bg-teal-700 hover:bg-teal-900 text-white font-bold py-2 px-4 rounded-full"
-                >
-                  Select Profile
-                </button>
-              </div>
-
-              <Links />
 
               <!-- Use https://simpleicons.org/ to find the svg for your preferred product -->
             </div>
@@ -86,7 +123,7 @@
           <div class="w-full lg:w-2/5">
             <!-- Big profile image for side bar (desktop) -->
             <img
-              src="https://source.unsplash.com/MP0IUfwrn0A"
+              :src="profile.image"
               class="rounded-none lg:rounded-lg shadow-2xl hidden lg:block"
             />
           </div>
@@ -116,16 +153,25 @@ export default {
     const showEdit = ref(false);
     const showSelect = ref(false);
     const publicKey = ref("");
-    provide(PIConstants.PUBLIC_KEY, publicKey);
-    let seed = window.localStorage.getItem(LSConstants.SEED);
-    let network = window.localStorage.getItem(LSConstants.NETWORK);
-    let chain = window.localStorage.getItem(LSConstants.CHAIN);
+    const profile = ref({ bio: "empty", image: "" });
+
     let computer = new Computer({
-      chain: chain,
-      network: network,
-      seed: seed
+      chain: window.localStorage.getItem(LSConstants.CHAIN),
+      network: window.localStorage.getItem(LSConstants.NETWORK),
+      seed: window.localStorage.getItem(LSConstants.SEED)
     });
+
+    const toggleShowEdit = () => {
+      showEdit.value = !showEdit.value;
+    };
+
+    const toggleShowSelect = () => {
+      showSelect.value = !showSelect.value;
+    };
+    provide(PIConstants.PUBLIC_KEY, publicKey);
     provide(PIConstants.COMPUTER, computer);
+    provide(PIConstants.PROFILE_SHOW_EDIT_FUNCTION, toggleShowEdit);
+    provide(PIConstants.PROFILE_SHOW_SELECT_FUNCTION, toggleShowSelect);
     publicKey.value = (await computer.db.wallet.getPublicKey()).toString();
     let address = (await computer.db.wallet.getAddress()).toString();
     let balance = (await computer.db.wallet.getBalance()).toString();
@@ -138,13 +184,19 @@ export default {
       displayName,
       showEdit,
       showSelect,
-      balance
+      balance,
+      toggleShowEdit,
+      toggleShowSelect,
+      profile
     };
   },
   components: {
     CreateProfile,
     List,
     Links
+  },
+  async mounted() {
+    this.fetchProfile();
   },
   methods: {
     showForm() {
@@ -160,12 +212,37 @@ export default {
         return "text-green-500";
       return "text-orange-500";
     },
+    async fetchProfile() {
+      let revs = await this.computer.getRevs(this.publicKey);
+      let pros = [];
+      await Promise.all(
+        revs.map(async r => {
+          console.log("Mapping: ", r);
+          let lr = "";
+          try {
+            lr = await this.computer.getLatestRev(r);
+          } catch (err) {
+            console.log(err);
+          }
+          if (lr === "") {
+            console.log("Latest Rev: ", lr);
+            lr = r;
+          }
+          let obj = await this.computer.sync(lr);
+          console.log("Obj: ", obj);
+          if (obj.contractTypeName && obj.contractTypeName === "UserProfile") {
+            pros.push(obj);
+          }
+        })
+      );
+      this.profile = pros[0];
+    },
     getClasses(placement) {
       let classes = "";
       switch (placement) {
         case "profileWrapper":
           classes =
-            "max-w-4xl flex items-center h-auto lg:h-screen flex-wrap mx-auto py-8 lg:my-0";
+            "max-w-4xl xs:mr-1 flex items-center h-auto lg:h-screen flex-wrap mx-auto py-8 lg:my-0";
           break;
         case "profile":
           classes =
@@ -181,9 +258,9 @@ export default {
         case "displayName":
           classes = "text-3xl font-bold pt-8 lg:pt-0";
           break;
-        case "nameUndeline":
+        case "nameUnderline":
           classes =
-            "mx-auto lg:mx-0 w-4/5 pt-3 border-b-2 border-teal-500 opacity-25";
+            "mx-auto lg:mx-0 w-4/5 pt-3 border-b-2 border-blue-500 opacity-25";
           break;
         case "detailsContainer":
           classes =

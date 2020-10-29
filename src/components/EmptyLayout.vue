@@ -1,7 +1,7 @@
 <template>
   <Suspense>
     <template #default>
-      <div>
+      <div class="flex flex-col h-full">
         <slot />
         <footer class="bottom-0 text-center">
           <div class="w-full  p-4">

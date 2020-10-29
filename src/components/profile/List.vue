@@ -1,21 +1,40 @@
 <template>
-  <div>
+  <div class="">
     <div v-if="searching">
       Searching ...
+    </div>
+    <div v-if="profiles.length === 0">
+      You Have No Profiles Yet. Please Create One. <br /><br />
+      <button
+        @click.prevent="toggleShowSelect"
+        class="bg-teal-700 hover:bg-teal-900 text-white font-bold py-2 px-4 rounded-full"
+      >
+        <i class="fas fa-arrow-left"></i> Back
+      </button>
     </div>
     <div
       class="overflow-y-auto"
       style="max-height: 700px; overflow: -moz-scrollbars-vertical;"
     >
+      <button  v-if="profiles.length > 0"
+        @click.prevent="toggleShowSelect"
+        class="bg-teal-700 hover:bg-teal-900 text-white font-bold py-2 px-4 rounded-full"
+      >
+        <i class="fas fa-arrow-left"></i> Back
+      </button>
       <div v-for="profile in profiles" :key="profile._rev">
         <div class=" rounded bg-white overflow-hidden shadow-lg mt-6">
-          <img class="w-full" :src="profile.image" alt="Profle Image" />
+          <img
+            class="h-56 w-full object-cover"
+            :src="profile.image"
+            alt="Profle Image"
+          />
           <div class="px-6 py-4">
             <div class="text-gray-900 font-bold text-xl mb-2">
               {{ profile.displayName }}
             </div>
             <p class="text-gray-700 text-base">
-              {{ profile.bio }}
+              <vue3-markdown-it :source="profile.bio" />
             </p>
           </div>
           <div class="px-6 pt-4 pb-2">
@@ -38,19 +57,21 @@
   </div>
 </template>
 <script>
-import { ref } from "vue";
+import { inject, ref } from "vue";
 import Computer from "bitcoin-computer";
 import * as LSConstants from "@/constants/LocalStorageConstants";
+import * as PIConstants from "@/constants/ProvideInjectConstants";
 export default {
   setup() {
     const profiles = ref([]);
     const searching = ref(false);
+    const toggleShowSelect = inject(PIConstants.PROFILE_SHOW_SELECT_FUNCTION);
     const computer = new Computer({
       seed: window.localStorage.getItem(LSConstants.SEED),
       chain: window.localStorage.getItem(LSConstants.CHAIN),
       network: window.localStorage.getItem(LSConstants.NETWORK)
     });
-    return { computer, profiles, searching };
+    return { computer, profiles, searching, toggleShowSelect };
   },
   data: function() {
     return {
