@@ -14,8 +14,19 @@
                 <div class="pb-5" v-if="thread && thread.title">
                   <!-- Thread Rev{{ thread._rev }}<br />
                   Thread ID{{ thread._id }}<br /> -->
-                  <div v-if="messages.length > 0" :class="getClass('messages')">
+                  <div
+                    v-if="messages.length > 0"
+                    :class="getClass('messages')"
+                    ref="msgContainer"
+                    style="max-height:500px;"
+                  >
                     <Messages :messages="messages" />
+                  </div>
+                  <div v-else class="text-3xl mx-4 px-4 my-4 py-4">
+                    <span
+                      ><i class="fas fa-spinner animate-spin"></i>
+                      <vue3-markdown-it source="Loading Friendly Profiles :)"
+                    /></span>
                   </div>
                   <SendMessage />
                 </div>
@@ -176,6 +187,8 @@ export default {
     const balance = ref(0);
     const to = ref("");
     const chatTitle = ref("");
+    let _arr = [];
+    const profiles = ref(_arr);
     let _chain = window.localStorage.getItem(LSConstants.CHAIN);
     let _net = window.localStorage.getItem(LSConstants.NETWORK);
     console.log(_chain, _net);
@@ -232,6 +245,7 @@ export default {
     provide(PIConstants.UPDATE_MESSAGES_FUNCTION, updateMessages);
     provide(PIConstants.UPDATE_THREAD_FUNCTION, updateThread);
     provide(PIConstants.SHOW_NEW_CHAT_MODAL_FUNCTION, showNewChatModal);
+    provide(PIConstants.PROFILE_LIST_KEY, profiles.value);
     return {
       selectedThread,
       computer,
@@ -251,7 +265,8 @@ export default {
       chatTitle,
       pk,
       showNewChatModal,
-      initLoaded
+      initLoaded,
+      profiles
     };
   },
   async mounted() {
@@ -261,8 +276,11 @@ export default {
     }
     //otherwise - mount the component
     console.log("Mouting Chat.vue with thread:", this.selectedThread);
-    await this.pollAll();
+    this.updateLoading(true);
+    this.pollAll();
     this.initLoaded = true;
+    var container = this.$refs.msgContainer;
+    container.scrollTop = container.scrollHeight + 120;
   },
   components: {
     Messages,
@@ -274,9 +292,7 @@ export default {
   data: function() {
     return {
       poll: null,
-      polling: null,
-      pollingMessages: null,
-      pollingLatestRev: null,
+      pollProfiles: null,
       latestRev: 0
     };
   },
@@ -291,7 +307,9 @@ export default {
     }
   },
   beforeUnmount() {
-    clearInterval(this.polling);
+    clearInterval(this.poll);
+    clearInterval(this.poll);
+    clearInterval(this.pollProfiles);
     clearInterval(this.pollingMessages);
     clearInterval(this.pollingLatestRev);
   },
@@ -334,23 +352,62 @@ export default {
             this.messages != initSync.messages
           ) {
             this.thread = await this.computer.sync(this.latestRev);
+            console.log("Getting Profiles");
             console.log("Assigned updated thread after sync");
             if (this.thread.messages !== this.messages) {
+              this.updateLoading(true);
+              this.getProfiles();
               this.messages = this.thread.messages;
             }
+            this.updateLoading(false);
           }
         } else {
           console.log("There is no selectedThread in memory.");
         }
         this.loading = false;
-        //then check if we are looking at at thread.
-        // if we are --
-        // call get latestRev on thread._rev
-        //if the latest rev is not equal to the thread rev
-        // sync the thread with the latest rev
-        //update the thread in memory.
-        //update the messages list
       }, 3000);
+    },
+    async getProfiles() {
+      console.log("Getting Profiles. ");
+      if (this.thread) {
+        let owners = this.thread._owners;
+        owners.map(async o => {
+          console.log("Getting revs to find profile for:", o);
+          let _revs = await this.computer.getRevs(o);
+          _revs.map(async r => {
+            let _synced = await this.computer.sync(r);
+            if (
+              _synced.contractTypeName &&
+              _synced.contractTypeName === "UserProfile"
+            ) {
+              let shouldAdd = true;
+              console.log("Found Profile:", _synced);
+              if (this.profiles.length === 0) {
+                this.profiles.push(_synced);
+                console.log("Added the first profile to the list");
+              } else {
+                //brute force this for now.
+                //TODO: filter properly
+                this.profiles.forEach(element => {
+                  console.log(
+                    "Check Profile List for this profile with id:",
+                    element._id
+                  );
+                  if (element._id === _synced._id) {
+                    shouldAdd = false;
+                    console.log("This profile already exists in the list");
+                  }
+                });
+              }
+              if (shouldAdd) {
+                console.log("Addded an additional profile to the list");
+                this.profiles.push(_synced);
+                this.updateMessages([]);
+              }
+            }
+          });
+        });
+      }
     },
     async createNewChatThread(chatTitle, to, pk) {
       console.log(chatTitle + " : " + pk + " : " + to);
@@ -382,7 +439,7 @@ export default {
           returnClass = "flex-1 overflow-x-hidden overflow-y-auto bg-gray-200";
           break;
         case "messages":
-          returnClass = "pt-5 pb-3 pl-3 pr-3 bg-white rounded";
+          returnClass = "pt-5 pb-3 pl-3 pr-3 bg-white rounded overflow-y-auto";
           break;
         case "content":
           returnClass = "mx-auto px-6 py-1";
