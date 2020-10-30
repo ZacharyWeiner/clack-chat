@@ -141,7 +141,6 @@ export default {
     const toggleShowEdit = inject(PIConstants.PROFILE_SHOW_EDIT_FUNCTION);
     console.log("Testing Key:", _publicKey.value);
     const publicKey = _publicKey;
-    //const computer = inject(PIConstants.COMPUTER);
     const computer = new Computer({
       seed: window.localStorage.getItem(LSConstants.SEED),
       chain: window.localStorage.getItem(LSConstants.CHAIN),
@@ -233,9 +232,7 @@ export default {
         network: window.localStorage.getItem(LSConstants.NETWORK)
       });
       let _contract = await FileUtils.importFromPublic("user-profile.js");
-      console.log(_contract);
       let pkString = this.publicKey.toString();
-      console.log("PK String before deploy", pkString);
       let profileTxID = await _computer.new(_contract, [
         pkString,
         "clack.chat",
