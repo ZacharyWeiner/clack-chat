@@ -16,10 +16,10 @@
       class="overflow-y-auto"
       style="max-height: 700px; overflow: -moz-scrollbars-vertical;"
     >
-      <button  v-if="profiles.length > 0"
+      <button
+        v-if="profiles.length > 0"
         @click.prevent="toggleShowSelect"
-        class="bg-teal-700 hover:bg-teal-900 text-white font-bold py-2 px-4 rounded-full"
-      >
+        class="bg-teal-700 hover:bg-teal-900 text-white font-bold py-2 px-4 rounded-full">
         <i class="fas fa-arrow-left"></i> Back
       </button>
       <div v-for="profile in profiles" :key="profile._rev">
@@ -37,7 +37,7 @@
               <vue3-markdown-it :source="profile.bio" />
             </p>
           </div>
-          <div class="px-6 pt-4 pb-2">
+          <!-- <div class="px-6 pt-4 pb-2">
             <span
               class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
               >#photography</span
@@ -50,7 +50,7 @@
               class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
               >#winter</span
             >
-          </div>
+          </div> -->
         </div>
       </div>
     </div>

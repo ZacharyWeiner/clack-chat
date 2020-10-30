@@ -11,17 +11,18 @@
               class="rounded-full shadow-xl mx-auto -mt-16 h-48 w-48 bg-cover bg-center"
               :style="getImageUrlStyle"
             ></div>
-            <div class='mx-auto w-full'>
-            <h2 class="text-2xl text-gray-700 font-semibold capitalize text-center">
-              {{ displayName ? displayName : "Save a display name" }}
-            </h2>
+            <div class="mx-auto w-full">
+              <h2
+                class="text-2xl text-gray-700 font-semibold capitalize text-center"
+              >
+                {{ displayName ? displayName : "Save a display name" }}
+              </h2>
             </div>
             <div style="w-3/4 text-xs">
               <p class="break-all">
                 {{ publicKey }}
               </p>
             </div>
-
             <form @submit.prevent="createProfile">
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
                 <div>
@@ -36,9 +37,9 @@
                 </div>
 
                 <div>
-                  <label class="text-gray-700" for="emailAddress"
-                    >Website</label
-                  >
+                  <label class="text-gray-700" for="emailAddress">
+                    Website
+                  </label>
                   <input
                     class="form-input w-full mt-2 rounded-md focus:border-indigo-600"
                     type="website"
@@ -47,20 +48,19 @@
                 </div>
 
                 <div>
-                  <label class="text-gray-700" for="password"
-                    >Profile Image Link</label
-                  >
+                  <label class="text-gray-700">
+                    Profile Image Link
+                  </label>
                   <input
                     class="form-input w-full mt-2 rounded-md focus:border-indigo-600"
                     type="text"
                     v-model="imageUrl"
                   />
                 </div>
-
                 <div>
-                  <label class="text-gray-700" for="passwordConfirmation"
-                    >Company</label
-                  >
+                  <label class="text-gray-700" for="passwordConfirmation">
+                    Company
+                  </label>
                   <input
                     class="form-input w-full mt-2 rounded-md focus:border-indigo-600"
                     type="text"
@@ -68,9 +68,9 @@
                   />
                 </div>
                 <div>
-                  <label class="text-gray-700" for="passwordConfirmation"
-                    >Position</label
-                  >
+                  <label class="text-gray-700" for="passwordConfirmation">
+                    Position
+                  </label>
                   <input
                     class="form-input w-full mt-2 rounded-md focus:border-indigo-600"
                     type="text"
@@ -78,9 +78,9 @@
                   />
                 </div>
                 <div>
-                  <label class="text-gray-700" for="passwordConfirmation"
-                    >Company Link</label
-                  >
+                  <label class="text-gray-700" for="passwordConfirmation">
+                    Company Link
+                  </label>
                   <input
                     class="form-input w-full mt-2 rounded-md focus:border-indigo-600"
                     type="text"
@@ -90,28 +90,24 @@
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-1 gap-6 mt-4">
                 <div>
-                  <label class="text-gray-700" for="passwordConfirmation"
-                    >Bio (can be markdown)</label
-                  >
+                  <label class="text-gray-700" for="passwordConfirmation">
+                    Bio (can be markdown)
+                  </label>
                   <textarea
                     class="form-input w-full mt-2 rounded-md focus:border-indigo-600"
                     v-model="bio"
                   />
                 </div>
               </div>
-
               <div class="flex justify-end mt-4">
-                <button
-                  class="px-4 py-2 bg-gray-800 text-gray-200 rounded-md hover:bg-gray-700 focus:outline-none focus:bg-gray-700"
-                >
+                <button class="px-4 py-2 bg-gray-800 text-gray-200 rounded-md hover:bg-gray-700 focus:outline-none focus:bg-gray-700">
                   Save
                 </button>
               </div>
             </form>
             <button
               @click.prevent="toggleShowEdit"
-              class="px-4 py-2 bg-gray-800 text-gray-200 rounded-md hover:bg-gray-700 focus:outline-none focus:bg-gray-700"
-            >
+              class="px-4 py-2 bg-gray-800 text-gray-200 rounded-md hover:bg-gray-700 focus:outline-none focus:bg-gray-700">
               <i class="fas fa-arrow-left"></i>Back
             </button>
           </div>
