@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-start pb-4 bg-gray-100 rounded">
+  <div class="items-start pb-4 bg-gray-100 rounded">
     <img :src="image" class="w-10 h-10 rounded mr-3" />
     <div class="flex-1 overflow-hidden">
       <div class="">
