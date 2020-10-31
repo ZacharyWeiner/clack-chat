@@ -9,6 +9,7 @@ import Login from "../views/Login.vue";
 import Modal from "../views/Modal.vue";
 import Card from "../views/Card.vue";
 import Chat from "../views/Chat.vue";
+import Chat2 from "../views/Chat2.vue";
 import Profile from "../views/Profile.vue";
 import Blank from "../views/Blank.vue";
 
@@ -42,6 +43,12 @@ const routes = [
     name: "Chat",
     component: Chat,
     meta: { layout: "chat" }
+  },
+  {
+    path: "/chat2",
+    name: "Chat2",
+    component: Chat,
+    meta: { layout: "chat2" }
   },
   {
     path: "/profile",
