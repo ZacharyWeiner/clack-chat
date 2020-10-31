@@ -1,8 +1,28 @@
 <template>
   <Suspense>
     <template #default>
-      <div>
-        This page is loaded.
+      <div class="w-full flex">
+        <div class="w-1/4">
+          <h3>Threads</h3>
+          <div v-for="thread in chatThreadsList" :key="thread._id">
+            <button class="btn btn-primary w-full mt-1 mx-auto">
+              {{ thread.title }}
+            </button>
+          </div>
+        </div>
+        <div class="w-2/4">
+          <h3>{{ chatThreadsList[0].title }}</h3>
+          <hr />
+          <div v-for="m in chatThreadsList[0].messages" :key="m.date">
+            <Message :message="m" />
+          </div>
+        </div>
+        <div class="w-1/4">
+          <h3>Memebrs In Chat</h3>
+          <div v-for="profile in profiles" :key="profile._rev">
+            <Sidecard :profile="profile" />
+          </div>
+        </div>
       </div>
     </template>
     <template #fallback>
@@ -16,14 +36,19 @@ import { provide, ref } from "vue";
 import LoadingPanel from "./../components/chat/LoadingPanel";
 import * as LSConstants from "./../constants/LocalStorageConstants.js";
 import * as PIConstants from "./../constants/ProvideInjectConstants.js";
+import * as BCCConstants from "./../constants/BitcoinComputerConstants.js";
 import Computer from "bitcoin-computer";
 import FileUtils from "@/utilities/FileUtils.js";
 import BitcoinComputerUtils from "@/utilities/BitcoinComputerUtils.js";
+import Message from "@/components/chat2/Message";
+import Sidecard from "@/components/profile/Sidecard";
 export default {
   async setup() {
+    console.log("Chat2.setup() beginning.");
     //Create these as variables to print later,
     //Otherwise just use the getItem method directly
     //to initalize the computer.
+    let currentRevisionsList = [];
     const seed = window.localStorage.getItem(LSConstants.SEED);
     const chain = window.localStorage.getItem(LSConstants.CHAIN);
     const net = window.localStorage.getItem(LSConstants.NETWORK);
@@ -34,12 +59,15 @@ export default {
     const initLoaded = ref(false);
     const showNewChat = ref(false);
     const balance = ref(0);
+    const newestRevisionsList = ref([]);
+    const chatThreadsList = ref([]);
+    const profiles = ref([]);
     const computer = new Computer({
       seed: seed,
       chain: chain,
       network: net
     });
-    const pk = ref(computer.db.wallet.getPublicKey().toString());
+    const publicKey = ref(computer.db.wallet.getPublicKey().toString());
     console.log(
       `Computer Initialized on Chat.vue with \n seed: ${seed} \n\n on chain ${chain} and network: ${net}`
     );
@@ -50,20 +78,143 @@ export default {
     const showNewChatModal = () => {
       showNewChat.value = true;
     };
+    const updateChatThreadsList = _list => {
+      console.log("Updating Chat Threads List.");
+      chatThreadsList.value = _list;
+    };
+
+    const updateProfilesList = _list => {
+      console.log("Updating Profiles List.");
+      profiles.value = _list;
+    };
+    const updateCurrentRevisionsList = _list => {
+      console.log("Updating Current Revisions List.");
+      currentRevisionsList.value = _list;
+    };
+    //Inital state shoudl do all the heavy lifting
+    //This way the polling method that runs most often can be light weight.
+    const syncRevisions = async newestRevisions => {
+      //One by one, sync all the objects from the revisions.
+      let _threadsList = [];
+      let _profilesList = [];
+      newestRevisions.map(async revision => {
+        console.log(
+          "Preparing Chat.fetchInitialState() to sync revision:",
+          revision
+        );
+        let _smartObject = await computer.sync(revision);
+        console.log("Fetched Smart Object:", _smartObject);
+        //If the object is a chat-thread ->
+        if (
+          _smartObject.contractTypeID ===
+          BCCConstants.CONTRACT_TYPE_ID_CHAT_THREAD
+        ) {
+          //push it into the chat-threads list
+          _threadsList.push(_smartObject);
+        }
+        //If the object is a profile
+        else if (
+          _smartObject.contractTypeID ===
+          BCCConstants.CONTRACT_TYPE_ID_USER_PROFILE
+        ) {
+          //Check if there are any profiles in the list for this user already.
+          if (profiles.value.length === 0 || !profiles.value[publicKey.value]) {
+            //If not, push this profile into the profiles collection.
+            _profilesList.push(_smartObject);
+          }
+          //If so, check both profiles for this PK
+          //   If one of them has an owner matching our application PK,
+          //       store that as the users selected profile in localstorage
+          //       &  push that one into the profiles list
+          //   If none have assigned this app as an owner, leave the one in the list.
+        }
+      });
+      updateChatThreadsList(_threadsList);
+      updateProfilesList(_profilesList);
+      console.log("the list of chat-threads is: \n", _threadsList);
+      console.log("the list of profiles is: \n", _profilesList);
+      return { _threadsList, _profilesList };
+    };
+
+    const getNewestRevisions = async () => {
+      let newestRevisions = await BitcoinComputerUtils.getLatestSmartObjectRevisionIds(
+        computer,
+        publicKey.value
+      );
+      //If we get an error from fetching the latest smart object revisisons, do not go on.
+      if (typeof newestRevisions === Error) {
+        return;
+      }
+      console.log(
+        "Data returned from BitcoinUtils.getLatestSmartObjects in fetchInitalState(): \n ",
+        newestRevisions
+      );
+      //Store the revisions collection in a variable to be used later in Polling for Updates.
+      return newestRevisions;
+    };
+
+    const fetchInitialState = async () => {
+      console.log("fetchingInitialState() on Chat2.vue");
+      let newestRevisions = [];
+      updateLoading(true);
+      //check to see if we have a chat thread ID stored in localStorage.
+      let _chatThreadId = window.localStorage.getItem(
+        LSConstants.CHAT_THREAD_ID
+      );
+      //if we do have a thread in local storage, sync that thread first, and then do everything else (get profiles, other chats, etc... )
+      if (_chatThreadId) {
+        //TODO: Implement this branch
+      }
+      //If not
+      else {
+        //Get all the revisions from the public Key of the user
+        newestRevisions = await getNewestRevisions();
+        console.log(
+          "returned from getting newest revisisons.",
+          newestRevisions
+        );
+        let chats_and_profiles = await syncRevisions(newestRevisions);
+        console.log("Returned Chats Profiles List", chats_and_profiles);
+        //When all the smart objects have been synced and filtered.
+        //If there is no thread ID in storage assign the most recent chat-thread to the selected thread.
+        //In the method that updates the selected thread, assign the messages collection from the selected thread.
+        //All threads are synced at this point.
+        //start polling for updates.
+      }
+      initLoaded.value = true;
+      currentRevisionsList = newestRevisions;
+      updateLoading(false);
+      console.log("Completed fetchingInitialState() on Chat2.vue");
+      return newestRevisions;
+    };
     provide(PIConstants.COMPUTER, computer);
     provide(PIConstants.LOADING_KEY, loading);
+    if (!initLoaded.value) {
+      let rs = await fetchInitialState();
+      console.log("Rs: ", rs);
+    }
+    console.log("Chat2.setup() returning");
     return {
+      loading,
+      updateLoading,
       seed,
       chain,
       net,
       computer,
-      loading,
-      updateLoading,
-      open,
+      publicKey,
       balance,
-      pk,
+      newestRevisionsList,
+      chatThreadsList,
+      profiles,
       showNewChatModal,
-      initLoaded
+      initLoaded,
+      updateChatThreadsList,
+      updateProfilesList,
+      fetchInitialState,
+      getNewestRevisions,
+      syncRevisions,
+      currentRevisionsList,
+      updateCurrentRevisionsList
     };
   },
   async mounted() {
@@ -72,13 +223,14 @@ export default {
     if (!window.localStorage.getItem(LSConstants.SEED)) {
       this.$router.push("/login");
     }
-    //otherwise - mount the component.
-    this.updateLoading(true);
-    this.fetchInitialState();
+    //otherwise - start polling for new messages.
+    this.pollForUpdates();
   },
 
   components: {
-    LoadingPanel
+    LoadingPanel,
+    Message,
+    Sidecard
   },
   //Use Data properties ->
   // where the state of the propery is not bound to the UI
@@ -100,38 +252,25 @@ export default {
     clearInterval(this.poll);
   },
   methods: {
-    //Inital state shoudl do all the heavy lifting
-    //This way the polling method that runs most often can be light weight.
-    async fetchInitialState() {
-      console.log("fetchingInitialState() on Chat2.vue");
-      //check to see if we have a chat thread ID stored in localStorage.
-      //if we do, sync that thread first, and then do everything else
-      //If not
-      //Get all the revisions from the public Key of the user
-      //Store the revisions collection in a variable to be used later in Polling for Updates.
-      //One by one, sync all the objects from the revs
-      //If the object is a chat-thread -> push it into the chat-threads list
-      //If the object is a profile ->
-      //Check if there are any profiles in the list for this user already.
-      //If not, push this profile into the profiles list.
-      //If so, check both profiles for this PK
-      //   If one of them has an owner matching our application PK,
-      //       store that as the users selected profile in localstorage
-      //       &  push that one into the profiles list
-      //   If none have assigned this app as an owner, leave the one in the list.
-      //When all the smart objects have been synced and filtered.
-      //If there is no thread ID in storage assign the most recent chat-thread to the selected thread.
-      //In the method that updates the selected thread, assign the messages collection from the selected thread.
-      //All threads are synced at this point.
-      //Set Loading to False and start polling for updates.
-      console.log("Completed fetchingInitialState() on Chat2.vue");
-    },
     async pollForUpdates() {
       console.log("pollForUpdates() called on Chat2.vue");
       this.poll = setInterval(async () => {
         console.log("polling from this.poll() =>{setInterval} on Chat2.vue");
         //Get the latest revisions for this users PK
+        let response = await this.getNewestRevisions();
         //If the list is === to the current list of revisions do nothing, the state has not changed.
+        console.log(
+          "Response: \n",
+          response,
+          "currentRevs:",
+          this.currentRevisionsList
+        );
+        let comparison = this.selectNewRevsFromResponse(response, this.currentRevisionsList);
+        if (comparison) {
+          console.log(
+            "Nothing Has Changed, All revisions are the same as the last poll"
+          );
+        }
         //If the list is not === to the current list of revisions.
         //traverse the list of old revsisons and new revisisons, and pull a collection of the new ones.
         //For each new revsison ->
@@ -147,8 +286,27 @@ export default {
         console.log(
           "this.poll() =>{setInterval} iteration complete on Chat2.vue"
         );
-      }, 3000);
-      this.poll();
+      }, 5000);
+    },
+    selectNewRevsFromResponse(currentRevisions, newRevisions) {
+      var a = [];
+      var diff = [];
+      for (var i = 0; i < currentRevisions.length; i++) {
+        a[currentRevisions[i]] = true;
+      }
+
+      for (var ii = 0; ii < newRevisions.length; ii++) {
+        if (a[newRevisions[ii]]) {
+          delete a[newRevisions[ii]];
+        } else {
+          a[newRevisions[ii]] = true;
+        }
+      }
+
+      for (var k in a) {
+        diff.push(k);
+      }
+      return diff;
     },
     async fetchProfiles() {
       console.log("fetchProfiles() called on Chat2.vue");
@@ -174,7 +332,7 @@ export default {
     async pollForUpdatesOld() {
       this.poll = setInterval(async () => {
         //first get the latest threads, and send them to the sidebar
-        let _revs = await this.computer.getRevs(this.pk);
+        let _revs = await this.computer.getRevs(this.publicKey);
         console.log("Revs returned from getRevs in pollAll()", _revs);
         if (this.revList != _revs) {
           console.log(

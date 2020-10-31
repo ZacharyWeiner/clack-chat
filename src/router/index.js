@@ -47,7 +47,7 @@ const routes = [
   {
     path: "/chat2",
     name: "Chat2",
-    component: Chat,
+    component: Chat2,
     meta: { layout: "chat2" }
   },
   {

@@ -8,3 +8,4 @@ export const BCH = "BCH";
 export const DISPLAYNAME = "DISPLAYNAME";
 export const DEFAULT_ADDRESS = "DEFAULT_ADDRESS";
 export const DEFAULT_PATH = "m/44'/0'/0'/0";
+export const CHAT_THREAD_ID = "CHAT_THREAD_ID";
