@@ -472,10 +472,14 @@ export default {
         currentChatThread.value.title
       );
       console.log("Message", _message);
+      let _displayName = myProfile.value ? myProfile.value.displayName : null;
+      if(!_displayName){
+        _displayName = window.localStorage.getItem(LSConstants.DISPLAYNAME)
+      }      
       let _date = new Date().toString();
       let asJson = {
         pubKey: publicKey.value,
-        displayName: window.localStorage.getItem(LSConstants.DISPLAYNAME),
+        displayName: _displayName,
         message: _message,
         date: _date
       };
@@ -727,7 +731,7 @@ export default {
           console.log("Got profile for image, src is:", profile.image);
         }
       });
-      return profile ? profile.image : "default image path";
+      return profile ? profile.image : "https://www.winhelponline.com/blog/wp-content/uploads/2017/12/user.png";
     },
     getDisplayNameForMessage(message) {
       let _message = null;
@@ -753,7 +757,9 @@ export default {
           );
         }
       });
-      return profile ? profile.displayName : message.displayName;
+      let response =  profile ? profile.displayName : message.displayName;
+      if(response) return response;
+      return "Psudo";
     },
     async addMyProfileToThread() {
       if (!this.myProfile) {

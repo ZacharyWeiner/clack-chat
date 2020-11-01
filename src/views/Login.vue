@@ -151,7 +151,7 @@ export default defineComponent({
         window.localStorage.setItem(Constants.DISPLAYNAME, name);
         window.localStorage.setItem(Constants.CHAIN, chain);
         window.localStorage.setItem(Constants.NETWORK, net);
-        router.push("/chat");
+        router.push("/chat2");
       } catch (err) {
         console.log(err);
         if (
