@@ -22,7 +22,7 @@
               }}
             </h3>
             <button @click.prevent="addMyProfileToThread">
-              Select Profile
+              Add My Profile
             </button>
             <hr />
             <div
@@ -59,6 +59,12 @@
           <h3>Members In Chat</h3>
           <div v-for="profile in profiles" :key="profile._rev">
             <Sidecard :profile="profile" />
+          </div>
+          <h3>Lurkers</h3>
+          <div v-for="owner in currentChatThread._owners" :key="owner">
+            <div v-if="!hasProfile(owner)">
+              {{ owner }}
+            </div>
           </div>
         </div>
       </div>
@@ -141,7 +147,7 @@ export default {
     };
 
     const updateCurrentChatThread = _thread => {
-      console.log("Updating chat thread to:", _thread.title);
+      console.log("Updating chat thread to:", _thread);
       currentChatThread.value = _thread;
       window.localStorage.setItem(LSConstants.CHAT_THREAD_ID, _thread._id);
     };
@@ -149,6 +155,20 @@ export default {
     const updateCurrentMessages = _msgList => {
       console.log("updating the currentmesssage list:", _msgList);
       currentMessages.value = _msgList;
+    };
+
+    const syncThreadProfiles = async () => {
+      pausePolling.value = true;
+      let keyPairs = currentChatThread.value.profiles;
+      console.log("Profile Keypairs", keyPairs);
+      keyPairs.forEach(async kp => {
+        let _asJson = JSON.parse(kp);
+        console.log("about to sync profile");
+        let _profile = await computer.sync(_asJson.profileId);
+        console.log("sync profile complete", _profile);
+        profiles.value.push(_profile);
+      });
+      pausePolling.value = false;
     };
 
     const sendNewMessage = async _message => {
@@ -208,7 +228,7 @@ export default {
           //Check if there are any profiles in the list for this user already.
           if (profiles.value.length === 0) {
             //If not, push this profile into the profiles collection.
-            _profilesList.push(_smartObject);
+            //_profilesList.push(_smartObject);
             myProfile.value = _smartObject;
           }
           //If so, check both profiles for this PK
@@ -254,7 +274,11 @@ export default {
       let { _threadsList, _profilesList } = await syncRevisions(
         newestRevisions
       );
-      console.log("Returned Chats Profiles List", _threadsList, _profilesList);
+      console.log(
+        "Returned Chats Profiles List For Current User",
+        _threadsList,
+        _profilesList
+      );
       let saved_id = window.localStorage.getItem(LSConstants.CHAT_THREAD_ID);
       if (saved_id) {
         _threadsList.map(t => {
@@ -274,6 +298,7 @@ export default {
       currentRevisionsList = newestRevisions;
       updateLoading(false);
       console.log("Completed fetchingInitialState() on Chat2.vue");
+      syncThreadProfiles();
       return newestRevisions;
     };
     provide(PIConstants.COMPUTER, computer);
@@ -364,6 +389,18 @@ export default {
     clearInterval(this.poll);
   },
   methods: {
+    hasProfile(ownerPk) {
+      console.log("Comparing PK for profiles:", ownerPk);
+      let _profilePubKeys = this.currentChatThread.profiles.map(p => {
+        return JSON.parse(p).pubKey;
+      });
+      console.log("Profiles List Public Keys", _profilePubKeys);
+      if (_profilePubKeys.includes(ownerPk)) {
+        return true;
+      } else {
+        return false;
+      }
+    },
     selectIndex(_index) {
       console.log("Selecting chat at array index:", _index);
       this.updateCurrentChatThread(this.chatThreadsList[_index]);
@@ -378,7 +415,10 @@ export default {
         return "";
       }
       let pubKey = _message.pubKey;
-      console.log("Message for getting URL should be the URL or null", pubKey);
+      console.log(
+        "Message for getting URL should be the PubKey of owner or null",
+        pubKey
+      );
       let profile = null;
       this.profiles.map(p => {
         console.log("Owners & Public Key:", p._owners, pubKey);
@@ -390,8 +430,18 @@ export default {
       return profile ? profile.image : "default image path";
     },
     getDisplayNameForMessage(message) {
-      let pubKey = message.pubKey;
-      console.log("Message for getting URL should be the URL or null", pubKey);
+      let _message = null;
+      try {
+        _message = JSON.parse(message);
+      } catch (err) {
+        console.log(err);
+        return "";
+      }
+      let pubKey = _message.pubKey;
+      console.log(
+        "Message for getting display Name should be the pubKey of owner or null",
+        pubKey
+      );
       let profile = null;
       this.profiles.map(p => {
         console.log("Owners & Public Key:", p._owners, pubKey);
@@ -406,6 +456,12 @@ export default {
       return profile ? profile.displayName : message.displayName;
     },
     async addMyProfileToThread() {
+      if (!this.myProfile) {
+        alert(
+          "You have to have a profile before you can add it. Head over to clack.chat/profile to set one up."
+        );
+        return;
+      }
       this.pausePolling = true;
       let asJson = {
         pubKey: this.publicKey,
@@ -414,16 +470,26 @@ export default {
       let latestRevision = await this.computer.getLatestRev(
         this.currentChatThread._id
       );
+      console.log(
+        "Result from getting latest rev so we can add a profile",
+        latestRevision
+      );
       let syncedForSend = await this.computer.sync(latestRevision);
-      let canSend = false;
+      console.log(
+        "Synced before adding profile to collection: ",
+        syncedForSend
+      );
+      let canSend = true;
       if ("profiles" in syncedForSend) {
         syncedForSend.profiles.map(p => {
           if (JSON.parse(p).pubKey == this.publicKey) {
-            canSend = true;
+            canSend = false;
           }
         });
         if (canSend) {
-          let result = await syncedForSend.addProfile(JSON.stringify(asJson));
+          let pair = JSON.stringify(asJson);
+          console.log("PubKey Profile Pair to Save:", pair);
+          let result = await syncedForSend.addProfile(pair);
           console.log("The result of adding the profile was: ", result);
         }
       } else {

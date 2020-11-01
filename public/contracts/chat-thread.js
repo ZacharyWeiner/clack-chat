@@ -34,7 +34,7 @@ export default class Chat {
     return "success";
   }
 
-  addMyProfile(pubKeyProfilePair) {
+  addProfile(pubKeyProfilePair) {
     if (this.archived === true)
       return new Error("This Thread is already archived.");
     this.profiles.push(pubKeyProfilePair);
