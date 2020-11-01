@@ -1,18 +1,57 @@
 <template>
   <Suspense>
     <template #default>
-      <div class="w-full flex">
-        <div class="w-1/4">
-          <h3>Threads</h3>
-          <div v-for="(thread, index) in chatThreadsList" :key="thread._id">
-            <button
-              class="btn btn-primary w-full mt-1 mx-auto"
-              @click.prevent="selectIndex(index)"
-            >
-              {{ thread.title }}
-            </button>
+      <div class="flex h-screen bg-gray-200 font-roboto">
+        <div class="flex">
+          <!-- Backdrop -->
+          <div
+            :class="isOpen ? 'block' : 'hidden'"
+            @click="isOpen = false"
+            class="fixed z-20 inset-0 bg-black opacity-50 transition-opacity lg:hidden"
+          ></div>
+          <!-- End Backdrop -->
+
+          <div
+            :class="
+              isOpen ? 'translate-x-0 ease-out' : '-translate-x-full ease-in'
+            "
+            class="fixed z-30 inset-y-0 left-0 w-64 transition duration-300 transform bg-gray-900 overflow-y-auto lg:translate-x-0 lg:static lg:inset-0"
+          >
+            <div class="flex items-center justify-center mt-8">
+              <div class="flex items-center">
+                <Logo />
+                <span class="text-white text-2xl mx-2 font-semibold"
+                  >ClackChat</span
+                >
+              </div>
+            </div>
+
+            <nav class="mt-10">
+              <button
+                @click.prevent="showNewChatModal"
+                class="flex items-center mt-4 py-2 px-6 border-l-4 border-gray-900 text-gray-500 hover:bg-gray-600 hover:bg-opacity-25 hover:text-gray-100"
+              >
+                <i class="fas fa-plus h-5 w-5" aria-hidden="true"></i
+                ><span class="mx-4 text-lg ">New Chat</span>
+              </button>
+              <button
+                class="flex items-center mt-4 py-2 px-6 border-l-4 border-gray-900 text-gray-500 hover:bg-gray-600 hover:bg-opacity-25 hover:text-gray-100"
+              >
+                <i class="fas fa-comments h-5 w-5" aria-hidden="true"></i
+                ><span class="mx-4 text-lg "> My Threads</span>
+              </button>
+              <button
+                class="flex w-full items-center mt-4 mb-4"
+                v-for="thread in chatThreadsList"
+                :key="thread._id"
+                @click.prevent="updateCurrentChatThread(thread)"
+              >
+                <span class="mx-5 px-5 text-gray-500">{{ thread.title }} </span>
+              </button>
+            </nav>
           </div>
         </div>
+
         <div class="w-2/4">
           <div v-if="loading"><LoadingPanel /></div>
           <div class=" w-full">
@@ -67,6 +106,129 @@
             </div>
           </div>
         </div>
+        <!-- Begin New Chat Modal -->
+        <div
+          :class="
+            `modal ${!showNewChat &&
+              'opacity-0 pointer-events-none'} z-50 fixed w-full h-full top-0 left-0 flex items-center justify-center`
+          "
+        >
+          <div
+            class="modal-overlay absolute w-full h-full bg-gray-900 opacity-50"
+          ></div>
+
+          <div
+            class="modal-container w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto"
+          >
+            <!-- Add margin if you want to see some of the overlay behind the modal-->
+            <div class="modal-content py-4 text-left px-6">
+              <!--Body-->
+              <div
+                class="max-w-sm w-full bg-white shadow-md rounded-md overflow-hidden border"
+              >
+                <form>
+                  <div
+                    class="flex justify-between items-center px-5 py-3 text-gray-700 border-b"
+                  >
+                    <h3 class="text-xl">Create a New Thread</h3>
+                    <button @click="showNewChatModal">
+                      <svg
+                        class="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div class="px-1 py-2 bg-gray-200 text-gray-700 border-b">
+                    <label class="text-xs">Name Your New Thread</label>
+
+                    <div class="mt-2 relative rounded-md shadow-sm">
+                      <span
+                        class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-600"
+                      >
+                        <svg
+                          class="h-6 w-6"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"
+                          />
+                        </svg>
+                      </span>
+
+                      <input
+                        v-model="titleForNewChat"
+                        type="text"
+                        class="form-input w-full px-12 py-2 appearance-none rounded-md focus:border-indigo-600"
+                      />
+                    </div>
+                  </div>
+                  <div class="px-1 py-1 bg-gray-200 text-gray-700 border-b">
+                    <label class="text-xs">Invite With Public Key</label>
+
+                    <div class="mt-2 relative rounded-md shadow-sm">
+                      <span
+                        class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-600"
+                      >
+                        <svg
+                          class="h-6 w-6"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"
+                          />
+                        </svg>
+                      </span>
+
+                      <input
+                        type="text"
+                        class="form-input w-full px-12 py-2 appearance-none rounded-md focus:border-indigo-600"
+                        v-model="pkForNewChat"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="flex justify-between items-center px-5 py-3">
+                    <button
+                      @click="showNewChat = false"
+                      class="px-3 py-1 text-gray-700 text-sm rounded-md bg-gray-200 hover:bg-gray-300 focus:outline-none"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      @click.prevent="
+                        createNewChatThread(titleForNewChat, pkForNewChat, publicKey)
+                      "
+                      class="px-3 py-1 bg-indigo-600 text-white rounded-md text-sm hover:bg-indigo-500 focus:outline-none"
+                    >
+                      Save
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- End New Chat Modal -->
       </div>
     </template>
     <template #fallback>
@@ -87,6 +249,7 @@ import BitcoinComputerUtils from "@/utilities/BitcoinComputerUtils.js";
 //import Message from "@/components/chat2/Message";
 import NewMessage from "@/components/chat2/NewMessage";
 import Sidecard from "@/components/profile/Sidecard";
+import Logo from "./../components/Logo";
 export default {
   async setup() {
     console.log("Chat2.setup() beginning.");
@@ -113,6 +276,8 @@ export default {
     const currentMessages = ref([]);
     const myProfile = ref(null);
     const savedChatId = ref("");
+    const titleForNewChat = ref("");
+    const pkForNewChat = ref("");
     const computer = new Computer({
       seed: seed,
       chain: chain,
@@ -146,17 +311,6 @@ export default {
       currentRevisionsList.value = _list;
     };
 
-    const updateCurrentChatThread = _thread => {
-      console.log("Updating chat thread to:", _thread);
-      currentChatThread.value = _thread;
-      window.localStorage.setItem(LSConstants.CHAT_THREAD_ID, _thread._id);
-    };
-
-    const updateCurrentMessages = _msgList => {
-      console.log("updating the currentmesssage list:", _msgList);
-      currentMessages.value = _msgList;
-    };
-
     const syncThreadProfiles = async () => {
       pausePolling.value = true;
       let keyPairs = currentChatThread.value.profiles;
@@ -169,6 +323,20 @@ export default {
         profiles.value.push(_profile);
       });
       pausePolling.value = false;
+    };
+
+    const updateCurrentChatThread = _thread => {
+      console.log("Updating chat thread to:", _thread);
+      currentChatThread.value = _thread;
+      currentMessages.value = _thread.messages;
+      window.localStorage.setItem(LSConstants.CHAT_THREAD_ID, _thread._id);
+      profiles.value = [];
+      syncThreadProfiles();
+    };
+
+    const updateCurrentMessages = _msgList => {
+      console.log("updating the currentmesssage list:", _msgList);
+      currentMessages.value = _msgList;
     };
 
     const sendNewMessage = async _message => {
@@ -325,6 +493,7 @@ export default {
       selectedThreadIndex,
       updateSelectedThreadIndex,
       showNewChatModal,
+      showNewChat,
       initLoaded,
       updateChatThreadsList,
       updateProfilesList,
@@ -339,7 +508,9 @@ export default {
       currentMessages,
       updateCurrentMessages,
       myProfile,
-      savedChatId
+      savedChatId,
+      titleForNewChat,
+      pkForNewChat
     };
   },
   async mounted() {
@@ -359,7 +530,8 @@ export default {
     LoadingPanel,
     //Message,
     Sidecard,
-    NewMessage
+    NewMessage,
+    Logo
   },
   //Use Data properties ->
   // where the state of the propery is not bound to the UI
@@ -491,6 +663,7 @@ export default {
           console.log("PubKey Profile Pair to Save:", pair);
           let result = await syncedForSend.addProfile(pair);
           console.log("The result of adding the profile was: ", result);
+          if(result === "success"){alert("Successfully Added Your Profile Refresh To See The Changes.")}
         }
       } else {
         console.log("The chat thread does not have a profiles field.");
@@ -719,6 +892,8 @@ export default {
       }
     },
     async createNewChatThread(chatTitle, to, pk) {
+      this.pausePolling = true;
+      this.updateLoading(true);
       console.log(chatTitle + " : " + pk + " : " + to);
       try {
         let _contract = await FileUtils.importFromPublic("chat-thread.js");
@@ -734,6 +909,8 @@ export default {
         alert(err);
         this.open = false;
       }
+      this.pausePolling = false;
+      this.showNewChat = false;
     },
     getClass(placement) {
       let returnClass = "";
