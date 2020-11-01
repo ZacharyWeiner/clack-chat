@@ -4,21 +4,56 @@
       <div class="w-full flex">
         <div class="w-1/4">
           <h3>Threads</h3>
-          <div v-for="thread in chatThreadsList" :key="thread._id">
-            <button class="btn btn-primary w-full mt-1 mx-auto">
+          <div v-for="(thread, index) in chatThreadsList" :key="thread._id">
+            <button
+              class="btn btn-primary w-full mt-1 mx-auto"
+              @click.prevent="selectIndex(index)"
+            >
               {{ thread.title }}
             </button>
           </div>
         </div>
         <div class="w-2/4">
-          <h3>{{ chatThreadsList[0].title }}</h3>
-          <hr />
-          <div v-for="m in chatThreadsList[0].messages" :key="m.date">
-            <Message :message="m" />
+          <div v-if="loading"><LoadingPanel /></div>
+          <div class=" w-full">
+            <h3>
+              {{
+                currentChatThread ? currentChatThread.title : "Select A Chat"
+              }}
+            </h3>
+            <hr />
+            <div
+              id="messageContainer"
+              class="overflow-y-auto"
+              style="max-height:600px;"
+            >
+              <div v-for="m in reverseMessages" :key="m.date">
+                <div class="items-start pb-4 bg-gray-100 rounded">
+                  <img
+                    :src="getProfileImageForMessage(m)"
+                    class="w-10 h-10 rounded mr-3"
+                  />
+                  <div class="flex-1 overflow-hidden">
+                    <div class="">
+                      <span class="font-bold text-xs underline">{{
+                        getDisplayNameForMessage(m)
+                      }}</span>
+                      <span class="pl-3"></span>
+                      <span class="text-grey text-xs"> </span>
+                    </div>
+                    <br />
+                    <div class="message">
+                      <vue3-markdown-it :source="JSON.parse(m).message" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
+          <NewMessage />
         </div>
         <div class="w-1/4">
-          <h3>Memebrs In Chat</h3>
+          <h3>Members In Chat</h3>
           <div v-for="profile in profiles" :key="profile._rev">
             <Sidecard :profile="profile" />
           </div>
@@ -40,7 +75,8 @@ import * as BCCConstants from "./../constants/BitcoinComputerConstants.js";
 import Computer from "bitcoin-computer";
 import FileUtils from "@/utilities/FileUtils.js";
 import BitcoinComputerUtils from "@/utilities/BitcoinComputerUtils.js";
-import Message from "@/components/chat2/Message";
+//import Message from "@/components/chat2/Message";
+import NewMessage from "@/components/chat2/NewMessage";
 import Sidecard from "@/components/profile/Sidecard";
 export default {
   async setup() {
@@ -52,6 +88,7 @@ export default {
     const seed = window.localStorage.getItem(LSConstants.SEED);
     const chain = window.localStorage.getItem(LSConstants.CHAIN);
     const net = window.localStorage.getItem(LSConstants.NETWORK);
+    const pausePolling = ref(false);
     //Use const = Ref ->
     //When if a value change should notify the UI
     //causing an update
@@ -62,6 +99,9 @@ export default {
     const newestRevisionsList = ref([]);
     const chatThreadsList = ref([]);
     const profiles = ref([]);
+    const selectedThreadIndex = ref(0);
+    const currentChatThread = ref(null);
+    const currentMessages = ref([]);
     const computer = new Computer({
       seed: seed,
       chain: chain,
@@ -82,7 +122,10 @@ export default {
       console.log("Updating Chat Threads List.");
       chatThreadsList.value = _list;
     };
-
+    const updateSelectedThreadIndex = _index => {
+      console.log("Updating the Selected Thread Index.");
+      selectedThreadIndex.value = _index;
+    };
     const updateProfilesList = _list => {
       console.log("Updating Profiles List.");
       profiles.value = _list;
@@ -90,6 +133,45 @@ export default {
     const updateCurrentRevisionsList = _list => {
       console.log("Updating Current Revisions List.");
       currentRevisionsList.value = _list;
+    };
+
+    const updateCurrentChatThread = _thread => {
+      console.log("Updating chat thread to:", _thread.title);
+      currentChatThread.value = _thread;
+    };
+
+    const updateCurrentMessages = _msgList => {
+      console.log("updating the currentmesssage list:", _msgList);
+      currentMessages.value = _msgList;
+    };
+
+    const sendNewMessage = async _message => {
+      pausePolling.value = true;
+      console.log(
+        "Sending New Message thread: ",
+        currentChatThread.value.title
+      );
+      console.log("Message", _message);
+      let _date = new Date().toString();
+      let asJson = {
+        pubKey: publicKey.value,
+        displayName: window.localStorage.getItem(LSConstants.DISPLAYNAME),
+        message: _message,
+        date: _date
+      };
+      console.log(asJson);
+      let latestRev = await computer.getLatestRev(currentChatThread.value._id);
+      console.log(
+        "Before Sending a message to the thread check if we need to sync the object."
+      );
+      let syncedForSend = await computer.sync(latestRev);
+      await syncedForSend.post(JSON.stringify(asJson));
+      console.log(
+        "New Message sent to chat thread: ",
+        currentChatThread.value.title
+      );
+      currentMessages.value = [...JSON.stringify(asJson)];
+      pausePolling.value = false;
     };
     //Inital state shoudl do all the heavy lifting
     //This way the polling method that runs most often can be light weight.
@@ -173,8 +255,19 @@ export default {
           "returned from getting newest revisisons.",
           newestRevisions
         );
-        let chats_and_profiles = await syncRevisions(newestRevisions);
-        console.log("Returned Chats Profiles List", chats_and_profiles);
+        let { _threadsList, _profilesList } = await syncRevisions(
+          newestRevisions
+        );
+        console.log(
+          "Returned Chats Profiles List",
+          _threadsList,
+          _profilesList
+        );
+        currentChatThread.value = _threadsList[selectedThreadIndex];
+        if (_threadsList[selectedThreadIndex]) {
+          currentMessages.value =
+            _threadsList[selectedThreadIndex.value].messages;
+        }
         //When all the smart objects have been synced and filtered.
         //If there is no thread ID in storage assign the most recent chat-thread to the selected thread.
         //In the method that updates the selected thread, assign the messages collection from the selected thread.
@@ -189,6 +282,8 @@ export default {
     };
     provide(PIConstants.COMPUTER, computer);
     provide(PIConstants.LOADING_KEY, loading);
+    provide(PIConstants.SEND_NEW_MESSAGE_FUNCTION, sendNewMessage);
+    provide(PIConstants.UPDATE_LOADING_FUNCTION, updateLoading);
     if (!initLoaded.value) {
       let rs = await fetchInitialState();
       console.log("Rs: ", rs);
@@ -206,6 +301,8 @@ export default {
       newestRevisionsList,
       chatThreadsList,
       profiles,
+      selectedThreadIndex,
+      updateSelectedThreadIndex,
       showNewChatModal,
       initLoaded,
       updateChatThreadsList,
@@ -214,7 +311,12 @@ export default {
       getNewestRevisions,
       syncRevisions,
       currentRevisionsList,
-      updateCurrentRevisionsList
+      updateCurrentRevisionsList,
+      sendNewMessage,
+      currentChatThread,
+      updateCurrentChatThread,
+      currentMessages,
+      updateCurrentMessages
     };
   },
   async mounted() {
@@ -223,14 +325,18 @@ export default {
     if (!window.localStorage.getItem(LSConstants.SEED)) {
       this.$router.push("/login");
     }
+    // var objDiv = document.getElementById("messageContainer");
+    // objDiv.scrollTop = this.chatThreadsList[this.selectedThreadIndex].messages.length * 150;
+    // console.log("Scroll Top:", objDiv.scrollHeight);
     //otherwise - start polling for new messages.
     this.pollForUpdates();
   },
 
   components: {
     LoadingPanel,
-    Message,
-    Sidecard
+    //Message,
+    Sidecard,
+    NewMessage
   },
   //Use Data properties ->
   // where the state of the propery is not bound to the UI
@@ -241,7 +347,15 @@ export default {
       pollingForUpdates: false
     };
   },
-  computed: {},
+  computed: {
+    reverseMessages() {
+      if (this.currentMessages) {
+        let _messages = [...this.currentMessages];
+        return _messages.reverse();
+      }
+      return [];
+    }
+  },
   beforeUnmount() {
     console.log("beforeUnmount() called on Chat2.vue");
     //This.poll is set to a function that runs every X seconds
@@ -252,40 +366,126 @@ export default {
     clearInterval(this.poll);
   },
   methods: {
+    selectIndex(_index) {
+      console.log("Selecting chat at array index:", _index);
+      this.updateCurrentChatThread(this.chatThreadsList[_index]);
+      this.updateCurrentMessages(this.chatThreadsList[_index].messages);
+    },
+    getProfileImageForMessage(message) {
+      let _message = null;
+      try {
+        _message = JSON.parse(message);
+      } catch (err) {
+        console.log(err);
+        return "";
+      }
+      let pubKey = _message.pubKey;
+      console.log("Message for getting URL should be the URL or null", pubKey);
+      let profile = null;
+      this.profiles.map(p => {
+        console.log("Owners & Public Key:", p._owners, pubKey);
+        if (p._owners.includes(pubKey)) {
+          profile = p;
+          console.log("Got profile for image, src is:", profile.image);
+        }
+      });
+      return profile ? profile.image : "default image path";
+    },
+    getDisplayNameForMessage(message) {
+      let pubKey = message.pubKey;
+      console.log("Message for getting URL should be the URL or null", pubKey);
+      let profile = null;
+      this.profiles.map(p => {
+        console.log("Owners & Public Key:", p._owners, pubKey);
+        if (p._owners.includes(pubKey)) {
+          profile = p;
+          console.log(
+            "Got profile for displayName, name is:",
+            profile.displayName
+          );
+        }
+      });
+      return profile ? profile.displayName : message.displayName;
+    },
     async pollForUpdates() {
       console.log("pollForUpdates() called on Chat2.vue");
       this.poll = setInterval(async () => {
+        //If we are sending a message, dont run this polling session.
+        if (this.pausePolling === true) {
+          return;
+        }
+
         console.log("polling from this.poll() =>{setInterval} on Chat2.vue");
         //Get the latest revisions for this users PK
         let response = await this.getNewestRevisions();
-        //If the list is === to the current list of revisions do nothing, the state has not changed.
         console.log(
           "Response: \n",
           response,
           "currentRevs:",
           this.currentRevisionsList
         );
-        let comparison = this.selectNewRevsFromResponse(response, this.currentRevisionsList);
-        if (comparison) {
+        //traverse the list of old revsisons and new revisisons, and pull a collection of the new ones.
+        let comparison = this.selectNewRevsFromResponse(
+          response,
+          this.currentRevisionsList
+        );
+        this.currentRevisionsList = response;
+        //If the list is === to the current list of revisions do nothing, the state has not changed.
+        if (comparison.length === 0) {
           console.log(
             "Nothing Has Changed, All revisions are the same as the last poll"
           );
+        } else {
+          console.log(
+            "The revisions list has change since the last update:",
+            comparison
+          );
+          //For each revision ->
+          let in_memory = [];
+          //Check if its already synced or if its a new one.
+          //if we have one with the same rev in memory its the old rev.
+          comparison.map(c => {
+            this.chatThreadsList.forEach(ct => {
+              if (ct._rev === c) {
+                in_memory.push(c);
+              }
+            });
+          });
+          //re-filter the list to only get the new ones.
+          let newChatRevs = this.selectNewRevsFromResponse(
+            comparison,
+            in_memory
+          );
+          console.log("New Revs Only: ", newChatRevs);
+          newChatRevs.map(async nr => {
+            let _synced = await this.computer.sync(nr);
+            console.log(
+              "Synced newest revision for chat thread with title: ",
+              _synced.title
+            );
+            let indexOfMatching = -1;
+            this.chatThreadsList.forEach((ct, index) => {
+              if (ct._id === _synced._id) {
+                console.log("A thread in the current list has been updated");
+                indexOfMatching = index;
+              }
+            });
+            if (indexOfMatching > -1) {
+              this.chatThreadsList[indexOfMatching] = _synced;
+              if (this.currentChatThread._id === _synced._id) {
+                this.updateCurrentMessages(_synced.messages);
+              }
+              console.log("Set Chat threads at index: ", indexOfMatching);
+            } else {
+              this.chatThreadsList.push(_synced);
+              console.log("New Chat thread added to the end of the collection");
+            }
+          });
         }
-        //If the list is not === to the current list of revisions.
-        //traverse the list of old revsisons and new revisisons, and pull a collection of the new ones.
-        //For each new revsison ->
-        //  Sync the object
-        //  if the object is a chat ->
-        //  look for a chat with the same ID in the stored chat-threads list.
-        //  If there is one, replace it with the new thread
-        //  If it is === to the selected thread
-        //    for each message
-        //    if message is already in messages collection -> do nothing.
-        //    if message is not in the collection -> push it into the collection.
-        //  If Not -> push this new chat into the chat-threads list.
         console.log(
           "this.poll() =>{setInterval} iteration complete on Chat2.vue"
         );
+        if (this.loading) this.updateLoading(false);
       }, 5000);
     },
     selectNewRevsFromResponse(currentRevisions, newRevisions) {
