@@ -21,6 +21,9 @@
                 currentChatThread ? currentChatThread.title : "Select A Chat"
               }}
             </h3>
+            <button @click.prevent="addMyProfileToThread">
+              Select Profile
+            </button>
             <hr />
             <div
               id="messageContainer"
@@ -102,6 +105,8 @@ export default {
     const selectedThreadIndex = ref(0);
     const currentChatThread = ref(null);
     const currentMessages = ref([]);
+    const myProfile = ref(null);
+    const savedChatId = ref("");
     const computer = new Computer({
       seed: seed,
       chain: chain,
@@ -138,6 +143,7 @@ export default {
     const updateCurrentChatThread = _thread => {
       console.log("Updating chat thread to:", _thread.title);
       currentChatThread.value = _thread;
+      window.localStorage.setItem(LSConstants.CHAT_THREAD_ID, _thread._id);
     };
 
     const updateCurrentMessages = _msgList => {
@@ -179,7 +185,7 @@ export default {
       //One by one, sync all the objects from the revisions.
       let _threadsList = [];
       let _profilesList = [];
-      newestRevisions.map(async revision => {
+      await newestRevisions.map(async revision => {
         console.log(
           "Preparing Chat.fetchInitialState() to sync revision:",
           revision
@@ -200,9 +206,10 @@ export default {
           BCCConstants.CONTRACT_TYPE_ID_USER_PROFILE
         ) {
           //Check if there are any profiles in the list for this user already.
-          if (profiles.value.length === 0 || !profiles.value[publicKey.value]) {
+          if (profiles.value.length === 0) {
             //If not, push this profile into the profiles collection.
             _profilesList.push(_smartObject);
+            myProfile.value = _smartObject;
           }
           //If so, check both profiles for this PK
           //   If one of them has an owner matching our application PK,
@@ -240,40 +247,29 @@ export default {
       let newestRevisions = [];
       updateLoading(true);
       //check to see if we have a chat thread ID stored in localStorage.
-      let _chatThreadId = window.localStorage.getItem(
-        LSConstants.CHAT_THREAD_ID
+
+      //Get all the revisions from the public Key of the user
+      newestRevisions = await getNewestRevisions();
+      console.log("returned from getting newest revisisons.", newestRevisions);
+      let { _threadsList, _profilesList } = await syncRevisions(
+        newestRevisions
       );
-      //if we do have a thread in local storage, sync that thread first, and then do everything else (get profiles, other chats, etc... )
-      if (_chatThreadId) {
-        //TODO: Implement this branch
+      console.log("Returned Chats Profiles List", _threadsList, _profilesList);
+      let saved_id = window.localStorage.getItem(LSConstants.CHAT_THREAD_ID);
+      if (saved_id) {
+        _threadsList.map(t => {
+          if (t._id === saved_id) {
+            currentChatThread.value = t;
+            currentMessages.value = t.messages;
+          }
+        });
       }
-      //If not
-      else {
-        //Get all the revisions from the public Key of the user
-        newestRevisions = await getNewestRevisions();
-        console.log(
-          "returned from getting newest revisisons.",
-          newestRevisions
-        );
-        let { _threadsList, _profilesList } = await syncRevisions(
-          newestRevisions
-        );
-        console.log(
-          "Returned Chats Profiles List",
-          _threadsList,
-          _profilesList
-        );
-        currentChatThread.value = _threadsList[selectedThreadIndex];
-        if (_threadsList[selectedThreadIndex]) {
-          currentMessages.value =
-            _threadsList[selectedThreadIndex.value].messages;
-        }
-        //When all the smart objects have been synced and filtered.
-        //If there is no thread ID in storage assign the most recent chat-thread to the selected thread.
-        //In the method that updates the selected thread, assign the messages collection from the selected thread.
-        //All threads are synced at this point.
-        //start polling for updates.
-      }
+      //When all the smart objects have been synced and filtered.
+      //If there is no thread ID in storage assign the most recent chat-thread to the selected thread.
+      //In the method that updates the selected thread, assign the messages collection from the selected thread.
+      //All threads are synced at this point.
+      //start polling for updates.
+
       initLoaded.value = true;
       currentRevisionsList = newestRevisions;
       updateLoading(false);
@@ -316,7 +312,9 @@ export default {
       currentChatThread,
       updateCurrentChatThread,
       currentMessages,
-      updateCurrentMessages
+      updateCurrentMessages,
+      myProfile,
+      savedChatId
     };
   },
   async mounted() {
@@ -407,6 +405,32 @@ export default {
       });
       return profile ? profile.displayName : message.displayName;
     },
+    async addMyProfileToThread() {
+      this.pausePolling = true;
+      let asJson = {
+        pubKey: this.publicKey,
+        profileId: this.myProfile._id
+      };
+      let latestRevision = await this.computer.getLatestRev(
+        this.currentChatThread._id
+      );
+      let syncedForSend = await this.computer.sync(latestRevision);
+      let canSend = false;
+      if ("profiles" in syncedForSend) {
+        syncedForSend.profiles.map(p => {
+          if (JSON.parse(p).pubKey == this.publicKey) {
+            canSend = true;
+          }
+        });
+        if (canSend) {
+          let result = await syncedForSend.addProfile(JSON.stringify(asJson));
+          console.log("The result of adding the profile was: ", result);
+        }
+      } else {
+        console.log("The chat thread does not have a profiles field.");
+      }
+      this.pausePolling = false;
+    },
     async pollForUpdates() {
       console.log("pollForUpdates() called on Chat2.vue");
       this.poll = setInterval(async () => {
@@ -418,6 +442,10 @@ export default {
         console.log("polling from this.poll() =>{setInterval} on Chat2.vue");
         //Get the latest revisions for this users PK
         let response = await this.getNewestRevisions();
+        if (response instanceof Error) {
+          alert(response);
+          return;
+        }
         console.log(
           "Response: \n",
           response,

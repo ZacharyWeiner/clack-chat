@@ -10,23 +10,34 @@ export default class Chat {
     this.lastUpdated = null;
     this.canArchive = publicKey;
     this.archived = false;
+    this.profiles = [];
   }
 
   post(messageAsJson) {
     if (this.archived === true)
       return new Error("This Thread is already archived.");
     this.messages.push(messageAsJson);
+    return "success";
   }
 
   invite(publicKey) {
     if (this.archived === true)
       return new Error("This Thread is already archived.");
     this._owners.push(publicKey);
+    return "success";
   }
 
   archive(pubKey) {
     if (!this.canArchive.includes(pubKey))
       return new Error("You do not have permission to archive this thread");
     this.archived = true;
+    return "success";
+  }
+
+  addMyProfile(pubKeyProfilePair) {
+    if (this.archived === true)
+      return new Error("This Thread is already archived.");
+    this.profiles.push(pubKeyProfilePair);
+    return "success";
   }
 }
