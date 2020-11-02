@@ -48,7 +48,7 @@ module.exports = {
     }
   },
   variants: {
-    animation: ["motion-safe"]
+    animation: ["responsive", "motion-safe"]
   },
   plugins: [require("@tailwindcss/custom-forms")]
 };

@@ -155,10 +155,7 @@
         <div class="rounded-lg shadow-md">
           <Hero />
           <div class="px-4 py-6 sm:px-0">
-            <div
-              class="border-4 border-dashed border-gray-200 rounded-lg h-96"
-            >
-            </div>
+            
           </div>
           <!-- /End replace -->
         </div>
@@ -166,8 +163,14 @@
       </div>
     </div>
     <Featured />
-          <CTA />
+
+    <Callout />
+    <CTA />
   </div>
+      <div
+              class="border-4 border-dashed border-gray-200 rounded-lg h-96"
+            >
+            </div>
 </template>
 <script>
 // @ is an alias to /src
@@ -177,6 +180,7 @@ import Hero from "./../components/home/Hero";
 import Featured from "./../components/home/Featured";
 import CTA from "./../components/home/CTA";
 import Logo from "./../components/Logo";
+import Callout from "./../components/home/Callout";
 
 export default {
   setup() {
@@ -188,7 +192,8 @@ export default {
     Hero,
     Featured,
     CTA,
-    Logo
+    Logo,
+    Callout
   },
   methods: {
     toggleMenu() {
