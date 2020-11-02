@@ -1,9 +1,9 @@
 <template>
   <div class="  shadow-2xl">
-    <div class="fadeIn max-w-6xl mx-auto mx-8 py-16">
+    <div class="max-w-6xl mx-auto mx-8 py-16  ">
       <div class="relative">
         <div
-          v-if="chain === LSConstants.BCH"
+          :class="chain === LSConstants.BCH ? ' transition duration-300 -translate-x-full opacity-100 right-0 h-auto' : 'ease-out transition duration-300 transform translate-x-full opacity-0 left-0 h-0'"
           class="relative lg:flex rounded-lg shadow-2xl overflow-hidden"
         >
           <div
@@ -52,7 +52,7 @@
               class="relative py-12 lg:py-24 px-8 lg:px-16 text-gray-700 leading-relaxed"
             >
               <p>
-                <strong class="text-gray-900 font-medium">Bitcoin Cash</strong>
+                <strong class="text-gray-900 font-medium transition-opacity">Bitcoin Cash</strong>
                 was the first big block solution to gain adoption as a fork from
                 the BTC chain &mdash; with block sizes up to 8mb.
               </p>
@@ -67,7 +67,7 @@
           </div>
         </div>
         <div
-          v-if="chain === LSConstants.BSV"
+          :class="chain === LSConstants.BSV ? 'transition duration-300 -translate-x-full opacity-100 right-0 h-auto' : 'ease-out transition duration-300 transform translate-x-full opacity-0 left-0 h-0'"
           class="relative lg:flex rounded-lg shadow-2xl overflow-hidden"
         >
           <div
@@ -113,10 +113,10 @@
               <polygon points="50,0 100,0 50,100 0,100" />
             </svg>
             <div
-              class="relative py-12 lg:py-24 px-8 lg:px-16 text-gray-700 leading-relaxed"
+              class="relative py-12 lg:py-24 px-8 lg:px-16 text-gray-700 leading-relaxed transition duration-300 opacity-100 "
             >
               <p>
-                <strong class="text-gray-900 font-medium">Bitcoin SV</strong>
+                <strong class="text-gray-900 font-medium ">Bitcoin SV</strong>
                 is a big block BTC fork that has nearly unlimited maximum
                 blocksize &mdash; and claims to be the one chain which can rule
                 them all.
