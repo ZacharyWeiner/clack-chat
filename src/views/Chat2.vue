@@ -80,7 +80,13 @@
               </button>
 
               <div class="relative mx-4 lg:mx-0">
-                <div class="text-3xl">{{ currentChatThread.title }}</div>
+                <div class="text-3xl">
+                  {{
+                    currentChatThread
+                      ? currentChatThread.title
+                      : "Create A Chat To Get Started"
+                  }}
+                </div>
                 <!-- <span class="absolute inset-y-0 left-0 pl-3 flex items-center">
           <svg class="h-5 w-5 text-gray-500" viewBox="0 0 24 24" fill="none">
             <path
@@ -103,7 +109,10 @@
 
             <div class="flex items-center">
               <div>
-                <span class="rounded px-1 py-1 text-white capitalize" :class="net">
+                <span
+                  class="rounded px-1 py-1 text-white capitalize"
+                  :class="net"
+                >
                   {{ net }}
                 </span>
               </div>
@@ -128,7 +137,9 @@
                   />
                 </svg>
               </button>
-              <div @click="dropdownOpen = !dropdownOpen">{{ profile ? profile.displayName : displayName  }}</div>
+              <div @click="dropdownOpen = !dropdownOpen">
+                {{ profile ? profile.displayName : displayName }}
+              </div>
               <div class="relative">
                 <!-- <button
           @click="dropdownOpen = !dropdownOpen"
@@ -169,7 +180,7 @@
           <!-- End Header -->
           <main :class="getClass('main')">
             <div :class="getClass('content')">
-              <div class='flex'>
+              <div class="flex">
                 <div class="w-full md:w-3/4">
                   <div v-if="loading"><LoadingPanel /></div>
                   <div class=" w-full flex-reverse">
@@ -178,6 +189,9 @@
                       class="overflow-y-auto"
                       style="max-height:600px;"
                     >
+                      <div v-if="!currentChatThread">
+                        <vue3-markdown-it :source="noMessagesText" />
+                      </div>
                       <div v-for="m in reverseMessages" :key="m.date">
                         <div class="items-start pb-4 bg-gray-100 rounded">
                           <img
@@ -194,31 +208,47 @@
                             </div>
                             <br />
                             <div class="message">
-                              <vue3-markdown-it :source="JSON.parse(m).message" />
+                              <vue3-markdown-it
+                                :source="JSON.parse(m).message"
+                              />
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                  <NewMessage />
+                  <div v-if="currentChatThread">
+                    <NewMessage />
+                  </div>
                 </div>
-                <div class="hidden md:block md:w-1/4 mx-auto pl-2 pr-2 bg-gray-100 ml-2 ">
-                <button class='pt-1 pb-1 mx-auto rounded btn-primary w-full' @click.prevent="addMyProfileToThread">
-                      Add My Profile
-                    </button>
+                <div
+                  class="hidden md:block md:w-1/4 mx-auto pl-2 pr-2 bg-gray-100 ml-2 "
+                >
+                  <button
+                    class="pt-1 pb-1 mx-auto rounded btn-primary w-full"
+                    @click.prevent="addMyProfileToThread"
+                  >
+                    Add My Profile
+                  </button>
                   <h3 class="pt-2">Profiles In Chat</h3>
-                  
+
                   <div v-for="profile in profiles" :key="profile._rev">
                     <Sidecard :profile="profile" />
                   </div>
-                  <hr/>
-                  <br/>
+                  <hr />
+                  <br />
                   <h3>Lurkers</h3>
-                  <div v-for="owner in currentChatThread._owners" :key="owner">
-                    <div v-if="!hasProfile(owner)">
-                      <p class='break-all pt- pb-1'><i class="fas fa-key pl-2"></i>: {{ owner }}</p>
-                      <hr/>
+                  <div v-if="currentChatThread">
+                    <div
+                      v-for="owner in currentChatThread._owners"
+                      :key="owner"
+                    >
+                      <div v-if="!hasProfile(owner)">
+                        <p class="break-all pt- pb-1">
+                          <i class="fas fa-key pl-2"></i>: {{ owner }}
+                        </p>
+                        <hr />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -438,6 +468,9 @@ export default {
     };
 
     const syncThreadProfiles = async () => {
+      if (!currentChatThread.value) {
+        return;
+      }
       pausePolling.value = true;
       let keyPairs = currentChatThread.value.profiles;
       console.log("Profile Keypairs", keyPairs);
@@ -473,9 +506,9 @@ export default {
       );
       console.log("Message", _message);
       let _displayName = myProfile.value ? myProfile.value.displayName : null;
-      if(!_displayName){
-        _displayName = window.localStorage.getItem(LSConstants.DISPLAYNAME)
-      }      
+      if (!_displayName) {
+        _displayName = window.localStorage.getItem(LSConstants.DISPLAYNAME);
+      }
       let _date = new Date().toString();
       let asJson = {
         pubKey: publicKey.value,
@@ -528,7 +561,10 @@ export default {
             //If not, push this profile into the profiles collection.
             //_profilesList.push(_smartObject);
             myProfile.value = _smartObject;
-            window.localStorage.setItem(LSConstants.DISPLAYNAME, myProfile.value.displayName);
+            window.localStorage.setItem(
+              LSConstants.DISPLAYNAME,
+              myProfile.value.displayName
+            );
           }
           //TODO: If so, check both profiles for this PK
           //   If one of them has an owner matching our application PK,
@@ -673,6 +709,18 @@ export default {
     };
   },
   computed: {
+    noMessagesText() {
+      let messageText =
+        "### It Looks Like You Dont Have Any Chat's Yet. \n *Here are some things you can do to get started* :) \n ";
+      messageText += "<span class='pl-2 background-white'>";
+      messageText += "#### 1: Invite a friend.\r";
+      messageText += "#### 2: Create a *[Profile](https://www.clack.chat/profile)*.\r";
+      messageText += "Checkout this *[Markdown Guide](https://www.markdownguide.org)*.";
+      messageText += "";
+      messageText += "</span>";
+
+      return messageText;
+    },
     reverseMessages() {
       if (this.currentMessages) {
         let _messages = [...this.currentMessages];
@@ -729,7 +777,9 @@ export default {
           console.log("Got profile for image, src is:", profile.image);
         }
       });
-      return profile ? profile.image : "https://www.winhelponline.com/blog/wp-content/uploads/2017/12/user.png";
+      return profile
+        ? profile.image
+        : "https://www.winhelponline.com/blog/wp-content/uploads/2017/12/user.png";
     },
     getDisplayNameForMessage(message) {
       let _message = null;
@@ -755,8 +805,8 @@ export default {
           );
         }
       });
-      let response =  profile ? profile.displayName : message.displayName;
-      if(response) return response;
+      let response = profile ? profile.displayName : message.displayName;
+      if (response) return response;
       return "Psudo";
     },
     async addMyProfileToThread() {

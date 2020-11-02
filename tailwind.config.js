@@ -32,11 +32,9 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Inter var", ...defaultTheme.fontFamily.sans]
+        'montserrat': ['Montserrat']
       }
-    }
-  },
-  extend:{
+    },
     animation: {
       fadeIn: "fadeIn 2s ease-in forwards"
     },
