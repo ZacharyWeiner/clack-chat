@@ -103,12 +103,12 @@
 
             <div class="flex items-center">
               <div>
-                <span class="rounded px-1 py-1" :class="network">
-                  {{ network }}
+                <span class="rounded px-1 py-1 text-white capitalize" :class="net">
+                  {{ net }}
                 </span>
               </div>
               <div>
-                <span class="rounded px-1 py-1 ml-1" :class="chain">
+                <span class="rounded px-1 py-1 ml-1 text-white " :class="chain">
                   {{ chain }}
                 </span>
               </div>
@@ -203,7 +203,7 @@
                   </div>
                   <NewMessage />
                 </div>
-                <div class="hidden md:block md:w-1/4 pl-2 pr-2 ">
+                <div class="hidden md:block md:w-1/4 mx-auto pl-2 pr-2 bg-gray-100 ml-2 ">
                 <button class='pt-1 pb-1 mx-auto rounded btn-primary w-full' @click.prevent="addMyProfileToThread">
                       Add My Profile
                     </button>
@@ -528,6 +528,7 @@ export default {
             //If not, push this profile into the profiles collection.
             //_profilesList.push(_smartObject);
             myProfile.value = _smartObject;
+            window.localStorage.setItem(LSConstants.DISPLAYNAME, myProfile.value.displayName);
           }
           //If so, check both profiles for this PK
           //   If one of them has an owner matching our application PK,
@@ -651,9 +652,6 @@ export default {
     if (!window.localStorage.getItem(LSConstants.SEED)) {
       this.$router.push("/login");
     }
-    // var objDiv = document.getElementById("messageContainer");
-    // objDiv.scrollTop = this.chatThreadsList[this.selectedThreadIndex].messages.length * 150;
-    // console.log("Scroll Top:", objDiv.scrollHeight);
     //otherwise - start polling for new messages.
     this.pollForUpdates();
   },
