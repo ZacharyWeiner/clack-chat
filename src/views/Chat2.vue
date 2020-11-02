@@ -530,7 +530,7 @@ export default {
             myProfile.value = _smartObject;
             window.localStorage.setItem(LSConstants.DISPLAYNAME, myProfile.value.displayName);
           }
-          //If so, check both profiles for this PK
+          //TODO: If so, check both profiles for this PK
           //   If one of them has an owner matching our application PK,
           //       store that as the users selected profile in localstorage
           //       &  push that one into the profiles list

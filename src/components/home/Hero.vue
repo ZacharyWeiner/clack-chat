@@ -1,12 +1,12 @@
 <template>
   <main
-    class="mt-10 mx-auto max-w-screen-xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28"
+    class="mt-10 mx-auto max-w-screen-xl px-4 sm:mt-12 sm:px-6 md:mt-16 pb-6 lg:mt-20 lg:px-8 xl:mt-28"
   >
     <div class="sm:text-center lg:text-left">
       <h2
         class="text-4xl tracking-tight leading-10 font-extrabold text-gray-900 sm:text-5xl sm:leading-none md:text-6xl"
       >
-        <span class="text-indigo-600">Clack.Chat</span> <br class="xl:hidden" />
+        <span class="text-indigo-600">Clack.Chat</span> <br />
         Simple. Secure. On-Chain.
       </h2>
       <p

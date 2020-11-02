@@ -18,6 +18,15 @@
               <a class="underline" href="https://twitter.com/u/developingzack">
                 @DevelopingZack
               </a>
+              <br>
+              Founder:
+              <a class="underline" href="http://www.protoshi.co">
+                Protoshi.co
+              </a> 
+              <span class='mx-1'>| CTO:</span>
+              <a class="underline" href="http://www.artisint.com">
+                Artis International
+              </a>
             </span>
           </div>
         </footer>

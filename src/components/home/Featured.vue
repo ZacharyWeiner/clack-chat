@@ -45,7 +45,7 @@
                 </div>
               </div>
               <div class="ml-4">
-                <h4 class="text-lg leading-6 font-medium text-gray-900">
+                <h4 class="text-lg leading-6 font-medium text-gray-900 motion-safe:animate-fadeIn">
                   Clack.chat is Open Source
                 </h4>
                 <p class="mt-2 text-base leading-6 text-gray-500">
@@ -73,7 +73,7 @@
             </div>
           </li>
           <li class="mt-10 md:mt-0">
-            <div class="flex">
+            <div class="flex motion-safe:animate-fadeIn">
               <div class="flex-shrink-0">
                 <div
                   class="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white"
