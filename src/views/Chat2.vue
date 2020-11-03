@@ -189,9 +189,6 @@
                       class="overflow-y-auto"
                       style="max-height:600px;"
                     >
-                      <div v-if="!currentChatThread">
-                        <vue3-markdown-it :source="noMessagesText" />
-                      </div>
                       <div v-for="m in reverseMessages" :key="m.date">
                         <div class="items-start pb-4 bg-gray-100 rounded">
                           <img
@@ -217,6 +214,9 @@
                       </div>
                     </div>
                   </div>
+                   <div v-if="!currentChatThread" class='bg-white rounded pt-4 px-2'>
+                        <vue3-markdown-it :source="noMessagesText" />
+                      </div>
                   <div v-if="currentChatThread">
                     <NewMessage />
                   </div>
@@ -712,12 +712,15 @@ export default {
     noMessagesText() {
       let messageText =
         "### It Looks Like You Dont Have Any Chat's Yet. \n *Here are some things you can do to get started* :) \n ";
-      messageText += "<span class='pl-2 background-white'>";
+      messageText += "*** \n";
       messageText += "#### 1: Invite a friend.\r";
-      messageText += "#### 2: Create a *[Profile](https://www.clack.chat/profile)*.\r";
-      messageText += "Checkout this *[Markdown Guide](https://www.markdownguide.org)*.";
+      messageText += "#### 2: Create a *[Profile](http://www.clack.chat/profile)*.\r";
+      messageText += "#### 3: Every Message & Your Profile can use Markdown\n -Checkout this *[Markdown Guide](https://www.markdownguide.org)*. \n";
+      messageText += "  - [x] Create An Account \n - [ ] Invite A Friend \n - [ ] Create A Profile \n   - [] Checkout the Markdown Guide";
+      messageText += " you can even embed images, tables, and all kinds of formatting using markdown \n \n" + '![Philadelphias Magic Gardens. This place was so cool!](https://d33wubrfki0l68.cloudfront.net/eab45e25bb79970178fab7a2d10cba0209372a59/94d9e/assets/images/philly-magic-garden.jpg "Philadelphias Magic Gardens")';
       messageText += "";
-      messageText += "</span>";
+
+
 
       return messageText;
     },
