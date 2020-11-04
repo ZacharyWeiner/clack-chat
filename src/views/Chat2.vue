@@ -42,12 +42,12 @@
                 ><span class="mx-4 text-lg "> My Threads</span>
               </button>
               <button
-                class="flex w-full items-center mt-4 mb-4"
+                class="flex w-full items-center mt-2 mb-2 pb-2 pt-2 bg-gray-800 rounded ml-1 mr-1"
                 v-for="thread in chatThreadsList"
                 :key="thread._id"
                 @click.prevent="updateCurrentChatThread(thread)"
               >
-                <span class="mx-5 px-5 text-gray-500">{{ thread.title }} </span>
+                <span class="mx-5 px-5 text-gray-500 text-left">{{ thread.title }} </span>
               </button>
             </nav>
           </div>
@@ -80,11 +80,9 @@
               </button>
 
               <div class="relative mx-4 lg:mx-0">
-                <div class="text-3xl">
+                <div class="xs:text-lg xs:overflow-x-none md:text-3xl">
                   {{
-                    currentChatThread
-                      ? currentChatThread.title
-                      : "Create A Chat To Get Started"
+                    currentChatThread ? currentChatThread.title : "How To Clack"
                   }}
                 </div>
                 <!-- <span class="absolute inset-y-0 left-0 pl-3 flex items-center">
@@ -106,22 +104,22 @@
         /> -->
               </div>
             </div>
-
-            <div class="flex items-center">
+            
+            <div class="md:flex items-center">
               <div>
                 <span
-                  class="rounded px-1 py-1 text-white capitalize"
+                  class="xs:text-sm xs:px-0 xs:py-0 md:text-md rounded md:px-1 md:py-1 text-white capitalize"
                   :class="net"
                 >
                   {{ net }}
                 </span>
               </div>
               <div>
-                <span class="rounded px-1 py-1 ml-1 text-white " :class="chain">
+                <span class=" xs:px-0 xs:py-0 md:px-1 md:py-1 rounded ml-1 text-white " :class="chain">
                   {{ chain }}
                 </span>
               </div>
-              <button class="flex mx-4 text-gray-600 focus:outline-none">
+              <button class="flex mx-4 text-gray-600 focus:outline-none" @click="dropdownOpen = !dropdownOpen">
                 <svg
                   class="h-6 w-6"
                   viewBox="0 0 24 24"
@@ -187,7 +185,7 @@
                     <div
                       id="messageContainer"
                       class="overflow-y-auto"
-                      style="max-height:600px;"
+                      style="min-h-md max-height:600px;"
                     >
                       <div v-for="m in reverseMessages" :key="m.date">
                         <div class="items-start pb-4 bg-gray-100 rounded">
@@ -214,9 +212,12 @@
                       </div>
                     </div>
                   </div>
-                   <div v-if="!currentChatThread" class='bg-white rounded pt-4 px-2'>
-                        <vue3-markdown-it :source="noMessagesText" />
-                      </div>
+                  <div
+                    v-if="!currentChatThread"
+                    class="bg-white rounded pt-4 px-2"
+                  >
+                    <vue3-markdown-it :source="noMessagesText" />
+                  </div>
                   <div v-if="currentChatThread">
                     <NewMessage />
                   </div>
@@ -392,7 +393,7 @@
 </template>
 
 <script>
-import { provide, ref } from "vue";
+import { provide, ref, shallowRef } from "vue";
 import LoadingPanel from "./../components/chat/LoadingPanel";
 import * as LSConstants from "./../constants/LocalStorageConstants.js";
 import * as PIConstants from "./../constants/ProvideInjectConstants.js";
@@ -434,6 +435,7 @@ export default {
     const titleForNewChat = ref("");
     const pkForNewChat = ref("");
     const displayName = window.localStorage.getItem(LSConstants.DISPLAYNAME);
+    const isOpen = shallowRef(false);
     const computer = new Computer({
       seed: seed,
       chain: chain,
@@ -647,6 +649,7 @@ export default {
     console.log("Chat2.setup() returning");
     return {
       dropdownOpen,
+      isOpen,
       displayName,
       loading,
       updateLoading,
@@ -711,16 +714,19 @@ export default {
   computed: {
     noMessagesText() {
       let messageText =
-        "### It Looks Like You Dont Have Any Chat's Yet. \n *Here are some things you can do to get started* :) \n ";
+        "### Welcome Home: \n *Here are some things you can do to get started* :) \n ";
       messageText += "*** \n";
       messageText += "#### 1: Invite a friend.\r";
-      messageText += "#### 2: Create a *[Profile](http://www.clack.chat/profile)*.\r";
-      messageText += "#### 3: Every Message & Your Profile can use Markdown\n -Checkout this *[Markdown Guide](https://www.markdownguide.org)*. \n";
-      messageText += "  - [x] Create An Account \n - [ ] Invite A Friend \n - [ ] Create A Profile \n   - [] Checkout the Markdown Guide";
-      messageText += " you can even embed images, tables, and all kinds of formatting using markdown \n \n" + '![Philadelphias Magic Gardens. This place was so cool!](https://d33wubrfki0l68.cloudfront.net/eab45e25bb79970178fab7a2d10cba0209372a59/94d9e/assets/images/philly-magic-garden.jpg "Philadelphias Magic Gardens")';
+      messageText +=
+        "#### 2: Create a *[Profile](http://www.clack.chat/profile)*.\r";
+      messageText +=
+        "#### 3: Every Message & Your Profile can use Markdown\n -Checkout this *[Markdown Guide](https://www.markdownguide.org)*. \n";
+      messageText +=
+        "  - [x] Create An Account \n - [ ] Invite A Friend \n - [ ] Create A Profile \n   - [] Checkout the Markdown Guide";
+      messageText +=
+        " you can even embed images, tables, and all kinds of formatting using markdown \n \n" +
+        '![Philadelphias Magic Gardens. This place was so cool!](https://d33wubrfki0l68.cloudfront.net/eab45e25bb79970178fab7a2d10cba0209372a59/94d9e/assets/images/philly-magic-garden.jpg "Philadelphias Magic Gardens")';
       messageText += "";
-
-
 
       return messageText;
     },
@@ -928,7 +934,10 @@ export default {
             });
             if (indexOfMatching > -1) {
               this.chatThreadsList[indexOfMatching] = _synced;
-              if (this.currentChatThread._id === _synced._id) {
+              if (
+                this.currentChatThread._id === _synced._id &&
+                this.currentChatThread.messages.length < _synced.messages.length
+              ) {
                 this.updateCurrentMessages(_synced.messages);
               }
               console.log("Set Chat threads at index: ", indexOfMatching);
