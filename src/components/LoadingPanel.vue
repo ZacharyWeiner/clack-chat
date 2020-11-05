@@ -15,8 +15,8 @@
         <div
           class="max-w-sm p-5 w-full bg-white shadow-md rounded-md overflow-hidden border z-51"
         >
-          <i class="animate-spin fas fa-spinner text-4xl"></i>
-          <span class="text-xl  pl-10"> Loading Messages</span>
+          <i class="fas fa-spinner animate-spin"></i>
+          <span class="text-xl pl-10"> Loading ...</span>
         </div>
       </div>
     </div>

@@ -10,6 +10,9 @@ import Modal from "../views/Modal.vue";
 import Card from "../views/Card.vue";
 import Chat from "../views/Chat.vue";
 import Profile from "../views/Profile.vue";
+import Elections from "../views/Elections.vue";
+import ElectionResults from "../views/ElectionResults.vue";
+import Votes from "../views/Votes.vue";
 import Blank from "../views/Blank.vue";
 
 const routes = [
@@ -48,6 +51,24 @@ const routes = [
     name: "Profile",
     component: Profile,
     meta: { layout: "empty" }
+  },
+  {
+    path: "/elections/:id",
+    name: "ElectionResults",
+    component: ElectionResults,
+    meta: { layout: "election" }
+  },
+  {
+    path: "/elections",
+    name: "Elections",
+    component: Elections,
+    meta: { layout: "election" }
+  },
+  {
+    path: "/votes",
+    name: "Vote",
+    component: Votes,
+    meta: { layout: "election" }
   },
   {
     path: "/dashboard",
