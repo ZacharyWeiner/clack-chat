@@ -1,7 +1,7 @@
 <template>
   <Suspense>
     <template #default>
-      <div class="flex flex-col h-full">
+      <div class="flex flex-col h-full font-montserrat">
         <slot />
         <footer class="bottom-0 text-center">
           <div class="w-full  p-4">
@@ -18,6 +18,15 @@
               <a class="underline" href="https://twitter.com/u/developingzack">
                 @DevelopingZack
               </a>
+              <br />
+              Founder:
+              <a class="underline" href="http://www.protoshi.co">
+                Protoshi.co
+              </a>
+              <span class="mx-1">| CTO:</span>
+              <a class="underline" href="http://www.artisint.com">
+                Artis International
+              </a>
             </span>
           </div>
         </footer>
@@ -25,12 +34,11 @@
     </template>
     <template #loading>
       <div>
-        <div><i class="fas fa-spinner text-xl"></i>Loading...</div>
+        <div><i class="fas fa-spinner text-xl"></i>Loading Layout...</div>
       </div>
     </template>
   </Suspense>
 </template>
-
 <script>
 import { defineComponent } from "vue";
 export default defineComponent({
