@@ -36,13 +36,58 @@
               <div v-else>
                 <div :class="getClasses('mobileImage')"></div>
               </div>
-              <h1 :class="getClasses('displayName')">{{ displayName }}</h1>
-              <i class="fab fa-bitcoin fa-1x" :class="getCoinClass()"
-                >: <span class="align-middle"> {{ balance }}</span
-                ><span class="text-lg pl-2 mt-2 text-gray-700"
-                  >satoshis</span
-                ></i
-              >
+              <div class="w-full">
+                <h1 :class="getClasses('displayName')">{{ displayName }}</h1>
+                <div class="flex w-full ">
+                  <div class="w-4/5">
+                    <i class="fab fa-bitcoin fa-1x" :class="getCoinClass()"
+                      >: <span class="align-middle"> {{ balance }}</span
+                      ><span class="text-lg pl-2 mt-2 text-gray-700"
+                        >satoshis</span
+                      ></i
+                    >
+                  </div>
+                  <div class="">
+                    <span>
+                      <button
+                        class="px-1 py-0 text-sm ml-2 underline justify-end no-break"
+                        @click.prevent="showSend = !showSend"
+                      >
+                        {{ sendButtonText }} <i :class="sendButtonClass"></i>
+                      </button>
+                    </span>
+                  </div>
+                </div>
+                <div v-if="showSend" class="w-full">
+                  <div>
+                    <label class="text-gray-700" for="passwordConfirmation">
+                      Amount (in satoshis)
+                    </label>
+                    <input
+                      class="form-input w-full mt-2 rounded-md focus:border-indigo-600"
+                      type="text"
+                      v-model="amount"
+                    />
+                  </div>
+                  <div>
+                    <label class="text-gray-700" for="passwordConfirmation">
+                      Recipient Address:
+                    </label>
+                    <input
+                      class="form-input w-full mt-2 rounded-md focus:border-indigo-600"
+                      type="text"
+                      v-model="recipientAddress"
+                    />
+                  </div>
+                  <div class="flex w-full justify-end">
+                    <div>
+                      <button @click="sendTo" class="btn btn-secondary">
+                        Send &nbsp; <i class="fas fa-arrow-circle-right"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
               <div :class="getClasses('nameUnderline')"></div>
               <p :class="getClasses('detailsContainer')">
                 <i class="fas fa-map-pin p-2"></i>
@@ -162,6 +207,9 @@ import Links from "@/components/profile/Links";
 import List from "@/components/profile/List";
 export default {
   async setup() {
+    const showSend = ref(false);
+    const recipientAddress = ref("");
+    const amount = ref(0);
     const showEdit = ref(false);
     const showSelect = ref(false);
     const publicKey = ref("");
@@ -203,7 +251,10 @@ export default {
       balance,
       toggleShowEdit,
       toggleShowSelect,
-      profile
+      profile,
+      showSend,
+      recipientAddress,
+      amount
     };
   },
   components: {
@@ -224,6 +275,14 @@ export default {
       if (!this.profile || this.profile.image === null)
         return "https://www.winhelponline.com/blog/wp-content/uploads/2017/12/user.png";
       else return this.profile.image;
+    },
+    sendButtonText() {
+      if (this.showSend) return "Close";
+      else return "Send";
+    },
+    sendButtonClass() {
+      if (this.showSend) return "";
+      else return "fas fa-external-link-alt";
     }
   },
   methods: {
@@ -265,6 +324,23 @@ export default {
       );
       this.profile = pros[0];
     },
+    async sendTo() {
+      try {
+        let txId = await this.computer.db.wallet.send(
+          parseInt(this.amount, 10),
+          this.recipientAddress
+        );
+        console.log(txId);
+        alert(
+          `Successfuly sent ${this.amount} satoshis to ${this.recipientAddress}`
+        );
+        this.recipientAddress = "";
+        this.amount = 0;
+      } catch (err) {
+        console.log(err);
+        alert(err);
+      }
+    },
     getClasses(placement) {
       let classes = "";
       switch (placement) {
@@ -284,7 +360,7 @@ export default {
             "block lg:hidden rounded-full shadow-xl mx-auto -mt-16 h-48 w-48 bg-cover bg-center";
           break;
         case "displayName":
-          classes = "text-3xl font-bold pt-8 lg:pt-0";
+          classes = "text-3xl w-full font-bold pt-8 lg:pt-0";
           break;
         case "nameUnderline":
           classes =
