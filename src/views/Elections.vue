@@ -29,7 +29,14 @@
                           ></i>
                           <p class="text-xl">{{ votes[0].title }}</p>
                         </div>
-                        <div class="pl-1 ml-1"> <router-link :to="`/elections/${votes[0]._id}`"> View Results </router-link> </div>
+                        <div class="pl-1 ml-1">
+                          <a
+                            target="_blank"
+                            :href="`/elections/${votes[0]._id}`"
+                          >
+                            View Results
+                          </a>
+                        </div>
                         <div class="m-1 pt-1 rounded-bottom text-xs w-full">
                           Send Vote To PublicKey
                         </div>
@@ -104,6 +111,10 @@
             </div>
           </main>
         </div>
+        <NotificationModal
+          :isOpen="notificationOpen"
+          :message="notificationMessage"
+        />
       </div>
     </template>
     <template #loading>
@@ -120,11 +131,16 @@ import Mint from "@/components/elections/Mint.vue";
 //import VoteWallet from "@/components/elections/VoteWallet.vue";
 import Computer from "bitcoin-computer";
 import * as LSConstants from "@/constants/LocalStorageConstants.js";
+//import * as PIConstants from "@/constants/ProvideInjectConstants.js";
 import LoadingPanel from "@/components/LoadingPanel";
+import FileUtils from "./../utilities/FileUtils.js";
+import NotificationModal from "@/components/elections/NotificationModal.vue";
 export default defineComponent({
   async setup() {
     const pausePolling = ref(false);
     const loading = ref(false);
+    const notificationOpen = ref(false);
+    const notificationMessage = ref("");
     const publicKey = ref("");
     const address = ref("");
     const balance = ref("");
@@ -138,6 +154,7 @@ export default defineComponent({
       network: window.localStorage.getItem(LSConstants.NETWORK),
       chain: window.localStorage.getItem(LSConstants.CHAIN)
     });
+
     let a = await computer.db.wallet.getAddress().toString();
     address.value = a;
     let b = await computer.db.wallet.getBalance();
@@ -154,7 +171,6 @@ export default defineComponent({
         }),
         {}
       );
-
     return {
       pausePolling,
       loading,
@@ -167,14 +183,17 @@ export default defineComponent({
       groupByRoot,
       showMint,
       groupedVotes,
-      voterPublicKey
+      voterPublicKey,
+      notificationOpen,
+      notificationMessage
     };
   },
   components: {
     Header,
     Sidebar,
     LoadingPanel,
-    Mint
+    Mint,
+    NotificationModal
     //VoteWallet
   },
   async mounted() {
@@ -239,24 +258,62 @@ export default defineComponent({
       let lr = await this.computer.getLatestRev(vote._id);
       let election = await this.computer.sync(lr);
       let tx = await election.distribute(this.voterPublicKey);
+      this.notificationOpen = null;
+      this.notificationMessage = "Distributed 1 vote to " + this.voterPublicKey;
+      this.notificationOpen = true;
       console.log(tx);
       this.pausePolling = false;
       return tx;
     },
     async sendVote(vote, candidateId) {
+      this.pausePolling = true;
       let tx = "";
       let voteRev = await this.computer.getLatestRev(vote._id);
       let _vote = await this.computer.sync(voteRev);
+      let _receipt = null;
+      const RECEIPT = await FileUtils.importFromPublic("vote-receipt.js");
       if (candidateId === 1) {
+        let _receipt = await this.computer.new(RECEIPT, [this.publicKey]);
         tx = await _vote.voteA();
+        _receipt = await this.computer.sync(_receipt._id);
+        console.log(_vote._rootId, _vote.title, _vote.can1name, _vote.cand1PK);
+        await _receipt.finalizeReceipt(
+          _vote._rootId,
+          _vote.title,
+          _vote.can1name,
+          _vote.cand1PK
+        );
       }
       if (candidateId === 2) {
+        let _receipt = await this.computer.new(RECEIPT, [this.publicKey]);
         tx = await _vote.voteB();
+        _receipt = await this.computer.sync(_receipt._id);
+        console.log(_vote._rootId, _vote.title, _vote.can2name, _vote.cand2PK);
+        _receipt.finalizeReceipt(
+          _vote._rootId,
+          _vote.title,
+          _vote.can2name,
+          _vote.cand2PK
+        );
       }
       if (candidateId === 3) {
+        let _receipt = await this.computer.new(RECEIPT, [this.publicKey]);
         tx = await _vote.voteC();
+        _receipt = await this.computer.sync(_receipt._id);
+        console.log(_vote._rootId, _vote.title, _vote.can3name, _vote.cand3PK);
+        _receipt.finalizeReceipt(
+          _vote._rootId,
+          _vote.title,
+          _vote.can3name,
+          _vote.cand3PK
+        );
       }
-      console.log(tx);
+      this.notificationOpen = false;
+      this.notificationMessage =
+        "Your Vote has been sent. You can check it on chain";
+      this.notificationOpen = true;
+      console.log(tx, _receipt);
+      this.pausePolling = false;
     }
   }
 });

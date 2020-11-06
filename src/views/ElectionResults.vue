@@ -29,7 +29,7 @@
                       :href="`https://test.whatsonchain.com/tx/${rev.split(':')[0]}`"
                       target="_blank"
                     >
-                      {{ rev }}
+                      view on chain {{ rev.substring(0, 10) }}... 
                     </a>
                   </div>
                 </div>
@@ -71,7 +71,7 @@
                       :href="`https://test.whatsonchain.com/tx/${rev.split(':')[0]}`"
                       target="_blank"
                     >
-                      {{ rev }}
+                      view on chain {{ rev.substring(0, 10) }}...
                     </a>
                   </div>
                 </div>
@@ -222,7 +222,7 @@ export default defineComponent({
 
           this.candidate2Objects = _temp2;
 
-          this._can3revs = await this.computer.getRevs(this.election.cand1PK);
+          this._can3revs = await this.computer.getRevs(this.election.cand3PK);
           let _temp3 = [];
           console.log(this._can1revs);
           await Promise.all(

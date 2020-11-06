@@ -23,7 +23,7 @@ npm run lint
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
-
+For BTCC Limit on Deploying Contracts. 
 https://www.npmjs.com/package/dotenv
 .env
 BC_DUST_LIMIT=1

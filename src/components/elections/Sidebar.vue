@@ -46,7 +46,7 @@
           :class="[$route.name === 'Elections' ? activeClass : inactiveClass]"
           href="/elections"
         >
-          <i class="fas fa-vote-yea"></i>
+          <i class="fas fa-person-booth fa-2x"></i>
 
           <span class="mx-4">Elections</span>
         </a>
@@ -61,10 +61,19 @@
         </router-link> -->
         <a
           class="flex items-center mt-4 py-2 px-6 border-l-4"
+          :class="[$route.name === 'Votes' ? activeClass : inactiveClass]"
+          href="/votes"
+        >
+          <i class="fas fa-vote-yea fa-2x"></i>
+
+          <span class="mx-4">My Votes</span>
+        </a>
+        <a
+          class="flex items-center mt-4 py-2 px-6 border-l-4"
           :class="[$route.name === 'ElectionResults' ? activeClass : inactiveClass]"
           href="/elections/123"
         >
-          <i class="fas fa-vote-yea"></i>
+          <i class="fas fa-chart-bar fa-2x"></i>
 
           <span class="mx-4">Election Results</span>
         </a>
