@@ -7,7 +7,7 @@
           <Header />
           <main class="flex-1 overflow-y-auto bg-gray-200">
             <div class="container mx-auto px-6 py-8">
-              <span class="pl-6 text-3xl mt-2 pt-2 mb-2 pb-2">
+              <span class="pl-6 text-3xl mt-2 pt-2 mb-2 pb-2 text-indigo-800">
                 My Voting Record
               </span>
               <div
@@ -16,9 +16,9 @@
                 class="bg-white shadow-md w-full mb-2"
               >
                 <div class="flex">
-                  <div class="mt-2 pt-2 pl-2 text-lg w-full">
+                  <div class="mt-2 pt-2 pl-2 text-md w-full">
                     <i
-                      class="fas fa-vote-yea fa-2x text-indigo-500"
+                      class="fas fa-vote-yea text-indigo-500"
                       aria-hidden="true"
                     ></i>
                     {{ vote.electionTitle }}
@@ -28,13 +28,16 @@
                   </div>
                 </div>
                 <div class="mt-2 pt-2 pb-2 pl-10 text-xl text-gray-700">
-                  <div class="pl-6">
+                  <div class="">
                     <i
-                      class="far fa-check-square  fa-2x text-green-500 pr-3"
+                      class="far fa-check-square text-green-500 pr-3"
                     ></i
                     >{{ vote.candidateName }}
                   </div>
                 </div>
+              </div>
+              <div v-if="loading">
+                <LoadingPanel />
               </div>
             </div>
           </main>
@@ -53,16 +56,18 @@ import Sidebar from "@/components/elections/Sidebar.vue";
 import Header from "@/components/elections/Header.vue";
 import Computer from "bitcoin-computer";
 import * as LSConstants from "./../constants/LocalStorageConstants.js";
+import LoadingPanel from "./../components/LoadingPanel";
 
 export default defineComponent({
   async setup() {
+    const loading = ref(true);
     const votes = ref([]);
     const computer = new Computer({
       seed: window.localStorage.getItem(LSConstants.SEED),
       network: window.localStorage.getItem(LSConstants.NETWORK),
       chain: window.localStorage.getItem(LSConstants.CHAIN)
     });
-    return { computer, votes };
+    return { computer, votes, loading };
   },
   beforeUnmount() {
     clearInterval(this.poll);
@@ -77,7 +82,8 @@ export default defineComponent({
   },
   components: {
     Header,
-    Sidebar
+    Sidebar,
+    LoadingPanel
   },
   methods: {
     startPolling() {
@@ -98,6 +104,7 @@ export default defineComponent({
           })
         );
         this.votes = _temp;
+        this.loading = false;
       }, 3000);
     }
   }

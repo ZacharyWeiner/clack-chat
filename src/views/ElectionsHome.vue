@@ -159,7 +159,7 @@
     </div>
   </div>
   <Featured />
-  <Callout />
+
   <CTA />
 
   <div class="border-4 border-dashed border-gray-200 rounded-lg h-96"></div>
@@ -168,11 +168,11 @@
 // @ is an alias to /src
 //import HelloWorld from "@/components/HelloWorld.vue";
 import { ref } from "vue";
-import Hero from "./../components/home/Hero";
-import Featured from "./../components/home/Featured";
-import CTA from "./../components/home/CTA";
+import Hero from "./../components/elections/home/Hero";
+import Featured from "./../components/elections/home/Featured";
+import CTA from "./../components/elections/home/CTA";
 import Logo from "./../components/Logo";
-import Callout from "./../components/home/Callout";
+//import Callout from "./../components/home/Callout";
 
 export default {
   setup() {
@@ -184,8 +184,8 @@ export default {
     Hero,
     Featured,
     CTA,
-    Logo,
-    Callout
+    Logo
+    //Callout
   },
   methods: {
     toggleMenu() {

@@ -7,8 +7,8 @@
           <Header />
           <main class="flex overflow-y-auto bg-gray-200">
             <div class="container w-full mx-auto px-6 py-8">
-              <span class="text-xl"> Results For </span> <br />
-              <span class="text-3xl">
+              <span class="text-xl text-gray-700"> Results For: </span> <br />
+              <span class="text-3xl text-indigo-800">
                 {{ election ? election.title : "" }}
               </span>
               <div v-if="election" class="flex text-center">

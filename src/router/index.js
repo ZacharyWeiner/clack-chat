@@ -10,6 +10,7 @@ import Modal from "../views/Modal.vue";
 import Card from "../views/Card.vue";
 import Chat from "../views/Chat.vue";
 import Profile from "../views/Profile.vue";
+import ElectionsHome from "../views/ElectionsHome.vue";
 import Elections from "../views/Elections.vue";
 import ElectionResults from "../views/ElectionResults.vue";
 import Votes from "../views/Votes.vue";
@@ -50,6 +51,12 @@ const routes = [
     path: "/profile",
     name: "Profile",
     component: Profile,
+    meta: { layout: "empty" }
+  },
+  {
+    path: "/election",
+    name: "ElectionHome",
+    component: ElectionsHome,
     meta: { layout: "empty" }
   },
   {
