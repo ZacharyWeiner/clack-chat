@@ -30,5 +30,3 @@ For BTCC Limit on Deploying Contracts.
 https://www.npmjs.com/package/dotenv
 .env
 BC_DUST_LIMIT=1
-
-change for push
