@@ -26,7 +26,10 @@
         >
       </div>
 
-      <form class="mt-4" @submit.prevent="login(displayName, password, chain, network)">
+      <form
+        class="mt-4"
+        @submit.prevent="login(displayName, password, chain, network)"
+      >
         <label class="block">
           <span class="text-gray-700 text-sm">Display Name</span>
           <input
@@ -104,6 +107,8 @@ export default defineComponent({
     const checked = ref("");
     let _chain = window.localStorage.getItem(Constants.CHAIN);
     let _net = window.localStorage.getItem(Constants.NETWORK);
+    let site = window.localStorage.getItem(Constants.SITE);
+    console.log("Site setting @ time of login:", site);
     if (!_chain || _chain === "") {
       _chain = Constants.BSV;
     }
@@ -151,7 +156,13 @@ export default defineComponent({
         window.localStorage.setItem(Constants.DISPLAYNAME, name);
         window.localStorage.setItem(Constants.CHAIN, chain);
         window.localStorage.setItem(Constants.NETWORK, net);
-        router.push("/chat");
+        let site = window.localStorage.getItem(Constants.SITE);
+        console.log("Site setting @ time of login:", site);
+        if (site && site === Constants.SITE_ELECTIONS) {
+          router.push("/elections");
+        } else {
+          router.push("/chat");
+        }
       } catch (err) {
         console.log(err);
         if (

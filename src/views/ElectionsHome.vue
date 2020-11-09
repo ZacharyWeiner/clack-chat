@@ -172,6 +172,7 @@ import Hero from "./../components/elections/home/Hero";
 import Featured from "./../components/elections/home/Featured";
 import CTA from "./../components/elections/home/CTA";
 import Logo from "./../components/Logo";
+import * as LSConstants from "./../constants/LocalStorageConstants.js";
 //import Callout from "./../components/home/Callout";
 
 export default {
@@ -186,6 +187,9 @@ export default {
     CTA,
     Logo
     //Callout
+  },
+  mounted() {
+      window.localStorage.setItem(LSConstants.SITE, LSConstants.SITE_ELECTIONS);
   },
   methods: {
     toggleMenu() {

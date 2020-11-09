@@ -169,10 +169,10 @@
               </div>
               <div class="pt-12 pb-2">
                 <a
-                  href="/chat"
+                  :href="backLink"
                   class="bg-gray-700 hover:bg-gray-900 text-white font-bold py-4 no-underline px-4 rounded-full"
                 >
-                  <i class="fas fa-arrow-left"></i> Back To Chat
+                  <i class="fas fa-arrow-left"></i> Back
                 </a>
               </div>
             </div>
@@ -283,6 +283,11 @@ export default {
     sendButtonClass() {
       if (this.showSend) return "";
       else return "fas fa-external-link-alt";
+    },
+    backLink() {
+      let site = window.localStorage.getItem(LSConstants.SITE);
+      if (site && site === LSConstants.SITE_ELECTIONS) return "/elections";
+      else return "/chat";
     }
   },
   methods: {
