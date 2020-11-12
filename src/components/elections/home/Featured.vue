@@ -13,8 +13,8 @@
           Your Vote Should Be Tracked, Traced &amp; Verified By You
         </h3>
         <p class="mt-4 max-w-2xl text-xl leading-7 text-gray-500 lg:mx-auto">
-          The foundation of democracy is fundamental right for citizens to
-          paritcipate in selecting their government. To support fair, open, and
+          The foundation of democracy is the fundamental right for citizens to
+          participate in selecting their government. To support fair, open, and
           honest, elections need to be auditable by the voters.
         </p>
       </div>
@@ -114,8 +114,8 @@
                   Built in Security.
                 </h4>
                 <p class="mt-2 text-base leading-6 text-gray-500">
-                  Voting security is a paramount concern among contries and
-                  companies that hold digital elections. We've encorporated the
+                  Voting security is a paramount concern among countries and
+                  companies that hold digital elections. We've incorporated the
                   highest standard of security (the blockchain) to protect the
                   vote, the votes, and the integrity of all elections.
                 </p>
@@ -140,7 +140,7 @@
                   Elections are managed and maintained by election officials who
                   verify identity. In the physical world a human matches our ID
                   to the voter registration card. In the blockchain world we use
-                  a secure digital identity, that can not be faked.
+                  a secure digital identity that can not be faked.
                 </p>
               </div>
             </div>
