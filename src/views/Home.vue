@@ -173,6 +173,7 @@ import Featured from "./../components/home/Featured";
 import CTA from "./../components/home/CTA";
 import Logo from "./../components/Logo";
 import Callout from "./../components/home/Callout";
+import * as LSConstants from "./../constants/LocalStorageConstants.js";
 
 export default {
   setup() {
@@ -186,6 +187,9 @@ export default {
     CTA,
     Logo,
     Callout
+  },
+  mounted() {
+      window.localStorage.setItem(LSConstants.SITE, LSConstants.SITE_CHAT);
   },
   methods: {
     toggleMenu() {

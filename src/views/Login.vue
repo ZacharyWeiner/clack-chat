@@ -22,7 +22,7 @@
           />
         </svg>
         <span class="text-gray-700 font-semibold text-2xl text-center"
-          >Clack Chat</span
+          >{{titleText}}</span
         >
       </div>
 
@@ -185,6 +185,7 @@ export default defineComponent({
       password,
       checked,
       chain,
+      site,
       network,
       toggleChain,
       toggleNetwork
@@ -198,6 +199,12 @@ export default defineComponent({
     oppositeNetwork() {
       if (this.network === Constants.TESTNET) return Constants.MAINNET;
       return Constants.TESTNET;
+    },
+    titleText() {
+      if (this.site && this.site === Constants.SITE_ELECTIONS) {
+        return "Artis Elections";
+      }
+      return "Clack Chat";
     }
   }
 });
