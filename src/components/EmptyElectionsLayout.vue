@@ -1,9 +1,9 @@
 <template>
   <Suspense>
     <template #default>
-     <div class="flex flex-col h-full font-montserrat">
+      <div class="flex flex-col h-full">
         <slot />
-        <footer class="bottom-0 text-center">
+         <footer class="bottom-0 text-center">
           <div class="w-full  p-4">
             <h1 class="font-bold text-xs text-primary-600">
               Open Source Code On
@@ -28,16 +28,8 @@
         </footer>
       </div>
     </template>
-    <template #fallback>
-      <div>Loading...</div>
+    <template #loading>
+      Loading...
     </template>
   </Suspense>
 </template>
-
-<script>
-import { defineComponent } from "vue";
-
-export default defineComponent({
-
-});
-</script>

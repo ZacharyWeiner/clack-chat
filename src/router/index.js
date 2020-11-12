@@ -57,7 +57,7 @@ const routes = [
     path: "/election",
     name: "ElectionHome",
     component: ElectionsHome,
-    meta: { layout: "empty" }
+    meta: { layout: "empty-elections" }
   },
   {
     path: "/elections/:id",
